@@ -1,6 +1,7 @@
 package com.franciscodadone.gui;
 
 import com.fazecast.jSerialComm.SerialPort;
+import com.franciscodadone.controller.ArduinoHandler;
 import com.github.kkieffer.jcirculargauges.JArtificialHorizonGauge;
 import com.github.kkieffer.jcirculargauges.JCompass;
 import com.github.kkieffer.jcirculargauges.JSpeedometer;
@@ -34,8 +35,6 @@ public class MainFrame extends JFrame {
     private int gyUpTrim;
     private int gyDownTrim;
 
-    private int gyX;
-    private int gyY;
     private JArtificialHorizonGauge ah;
 
     public MainFrame() {
@@ -50,10 +49,6 @@ public class MainFrame extends JFrame {
         horizonPanel.add(ah);
         ah.setAttitude(1, 1);
 
-
-        // Max pitch 55
-        // Min pitch -55
-
         JCompass g = new JCompass(false);
         g.setColors(Color.WHITE, Color.YELLOW, null, Color.BLACK);
         g.setCourse(0);
@@ -67,90 +62,50 @@ public class MainFrame extends JFrame {
 
         this.pack();
 
-        SerialPort [] AvailablePorts = SerialPort.getCommPorts();
 
-        SerialPort MySerialPort = AvailablePorts[0];
 
-        int BaudRate = 9600;
-        int DataBits = 8;
-        int StopBits = SerialPort.ONE_STOP_BIT;
-        int Parity   = SerialPort.NO_PARITY;
-
-        MySerialPort.setComPortParameters(BaudRate,
-                DataBits,
-                StopBits,
-                Parity);
-
-        MySerialPort.setComPortTimeouts(SerialPort.TIMEOUT_READ_BLOCKING,
-                1000,
-                0);
-
-        MySerialPort.openPort();
+//        MySerialPort.isOpen()
 
         setGyroCENTERButton.addActionListener(e -> {
-            gyCenterHorizontalTrim = gyX;
-            gyCenterVerticalTrim = gyY;
+            gyCenterHorizontalTrim = ArduinoHandler.gyX;
+            gyCenterVerticalTrim = ArduinoHandler.gyY;
         });
 
         setGyroDOWNButton.addActionListener(e -> {
-            gyDownTrim = gyY;
+            gyDownTrim = ArduinoHandler.gyY;
         });
 
         setGyroUPButton.addActionListener(e -> {
-            gyUpTrim = gyY;
+            gyUpTrim = ArduinoHandler.gyY;
         });
 
         setGyroLEFTButton.addActionListener(e -> {
-            gyLeftTrim = gyX;
+            gyLeftTrim = ArduinoHandler.gyX;
         });
 
         setGyroRIGHTButton.addActionListener(e -> {
-            gyRightTrim = gyX;
+            gyRightTrim = ArduinoHandler.gyX;
         });
 
-        try {
-            while (true) {
-
-                byte[] readBuffer = new byte[100];
-                MySerialPort.readBytes(readBuffer, readBuffer.length);
-
-                String S = new String(readBuffer, "UTF-8");
-
-                for (String s : S.lines().toList()) {
-                    if (s.startsWith(";") && s.endsWith(";") && (s.length() >= 10)) {
-                        s = s.replace(";", "");
-                        Object[] arr = Arrays.stream(s.split(" ")).toArray();
-                        gyX = Integer.valueOf((String) arr[0]);
-                        gyY = Integer.valueOf((String) arr[1]);
-//                        System.out.println(Arrays.toString(Arrays.stream(s.split(" ")).toArray()));
-                        updateHorizon();
-                        break;
-                    }
-                }
+        new Thread(() -> {
+            while(true) {
+                updateHorizon();
             }
-        }
-        catch (Exception e) {
-            e.printStackTrace();
-        }
-        MySerialPort.closePort();
+        }).start();
     }
 
     private void updateHorizon() {
-        gyX -= gyCenterHorizontalTrim;
-        gyY -= gyCenterHorizontalTrim;
-        if (gyLeftTrim != 0 && gyX < 0) gyX = (gyX * -90) / gyLeftTrim;
-        if (gyRightTrim != 0 && gyX >= 0) gyX = (gyX * 90) / gyRightTrim;
+        ArduinoHandler.gyX -= gyCenterHorizontalTrim;
+        ArduinoHandler.gyY -= gyCenterHorizontalTrim;
+        int tempGyX = ArduinoHandler.gyX;
+        int tempGyY = ArduinoHandler.gyY;
 
+        if (gyLeftTrim != 0 && ArduinoHandler.gyX < 0) tempGyX = (Math.abs(ArduinoHandler.gyX) * 90) / gyLeftTrim;
+        if (gyRightTrim != 0 && ArduinoHandler.gyX >= 0) tempGyX = (Math.abs(ArduinoHandler.gyX) * 90) / gyRightTrim;
 
-        System.out.println(gyY);
-//        System.out.println(gyDownTrim);
-        if (gyDownTrim != 0 && gyY >= 0) gyY = (gyY * 55) / gyDownTrim;
-        if (gyUpTrim != 0 && gyY < 0) gyY = (gyY * -55) / gyUpTrim;
+        if (gyDownTrim != 0 && ArduinoHandler.gyY >= 0) tempGyY = (Math.abs(ArduinoHandler.gyY) * -55) / gyDownTrim;
+        if (gyUpTrim != 0 && ArduinoHandler.gyY < 0) tempGyY = (Math.abs(ArduinoHandler.gyY) * -55) / gyUpTrim;
 
-        System.out.println(gyY);
-        System.out.println(gyDownTrim);
-        System.out.println(gyUpTrim);
-        System.out.println("");
-        ah.setAttitude(gyX, (gyY != 0) ? gyY : 1);
+        ah.setAttitude(tempGyX, (tempGyY != 0) ? tempGyY : 1);
     }
 }
