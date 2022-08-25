@@ -119,36 +119,37 @@ void loop() {
   int16_t my=-(Mag[1]<<8 | Mag[0]);
   int16_t mz=-(Mag[5]<<8 | Mag[4]);
 
+  Serial.print(";");
   Serial.print (ax,DEC); 
-  Serial.print ("\t");
+  Serial.print (" ");
   Serial.print (ay,DEC);
-  Serial.print ("\t");
-  Serial.print (az,DEC);  
-  Serial.print ("\t");
-  
+  Serial.print (" ");
+  //Serial.print (az,DEC);  
+  Serial.print (" ");
+
+  /*
   // Gyroscope
   Serial.print (gx,DEC); 
-  Serial.print ("\t");
+  Serial.print (" ");
   Serial.print (gy,DEC);
-  Serial.print ("\t");
+  Serial.print (" ");
   Serial.print (gz,DEC);  
-  Serial.print ("\t");
+  */
 
-/*
+
   // Magnetometer
   Serial.print (mx+200,DEC); 
-  Serial.print ("\t");
+  Serial.print (" ");
   Serial.print (my-70,DEC);
-  Serial.print ("\t");
+  Serial.print (" ");
   Serial.print (mz-700,DEC);  
-  Serial.print ("\t");
 
-
+/*
   Serial.print("Altitude: ");
   Serial.print(mySensorA.readFloatAltitudeMeters(), 0);
 
   Serial.print(" TempA: ");
   Serial.print(mySensorA.readTempC(), 2);
 */
-  Serial.println("");
+  Serial.println(";");
 }
