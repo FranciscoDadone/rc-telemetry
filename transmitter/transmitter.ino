@@ -87,7 +87,8 @@ void interrupt() {
   intFlag = true;
 }
 
-// Main loop, read and display data
+int16_t ax, ay, az, gy, gx, gz, mx, my, mz;
+
 void loop() {
   while (!intFlag); // while
   intFlag = false;
@@ -96,14 +97,14 @@ void loop() {
   I2Cread(MPU9250_ADDRESS, 0x3B, 14, Buf);
   
   // Accelerometer
-  int16_t ax=-(Buf[0]<<8 | Buf[1]);
-  int16_t ay=-(Buf[2]<<8 | Buf[3]);
-  int16_t az=Buf[4]<<8 | Buf[5];
+  ax =- (Buf[0]<<8 | Buf[1]);
+  ay =- (Buf[2]<<8 | Buf[3]);
+  az = Buf[4]<<8 | Buf[5];
 
   // Gyroscope
-  int16_t gx=-(Buf[8]<<8 | Buf[9]);
-  int16_t gy=-(Buf[10]<<8 | Buf[11]);
-  int16_t gz=Buf[12]<<8 | Buf[13];
+  gx =- (Buf[8]<<8 | Buf[9]);
+  gy =- (Buf[10]<<8 | Buf[11]);
+  gz = Buf[12]<<8 | Buf[13];
   
   // Magnetometer
   uint8_t ST1;
@@ -115,10 +116,19 @@ void loop() {
   I2Cread(MAG_ADDRESS,0x03,7,Mag);
   
   // Magnetometer
-  int16_t mx=-(Mag[3]<<8 | Mag[2]);
-  int16_t my=-(Mag[1]<<8 | Mag[0]);
-  int16_t mz=-(Mag[5]<<8 | Mag[4]);
+  mx =- (Mag[3]<<8 | Mag[2]);
+  my =- (Mag[1]<<8 | Mag[0]);
+  mz =- (Mag[5]<<8 | Mag[4]);
 
+
+//  Serial.println(az);
+//  Serial.println(gx);
+//  Serial.println();
+
+  sendData();
+}
+
+void sendData() {
   Serial.print(";");
   Serial.print (ax,DEC); 
   Serial.print (" ");
@@ -126,6 +136,13 @@ void loop() {
   Serial.print (" ");
   Serial.print (az,DEC);  
   Serial.print (" ");
+
+  // Altitude and Temperature
+  Serial.print(mySensorA.readFloatAltitudeMeters(), 2);
+  Serial.print(" ");
+  Serial.print(mySensorA.readFloatPressure() / 100, 2);
+  Serial.print(" ");
+  Serial.print(mySensorA.readTempC(), 2);
 
   /*
   // Gyroscope
@@ -145,12 +162,5 @@ void loop() {
   Serial.print (mz-700,DEC);  
 */
 
-/*
-  Serial.print("Altitude: ");
-  Serial.print(mySensorA.readFloatAltitudeMeters(), 0);
-
-  Serial.print(" TempA: ");
-  Serial.print(mySensorA.readTempC(), 2);
-*/
   Serial.println(";");
 }

@@ -1,6 +1,7 @@
 package com.franciscodadone.controller;
 
 import com.fazecast.jSerialComm.SerialPort;
+import com.franciscodadone.model.BMP280;
 import com.franciscodadone.model.Horizon;
 
 import java.util.Arrays;
@@ -48,6 +49,8 @@ public class ArduinoHandler {
                         if (s.startsWith(";") && s.endsWith(";") && (s.length() >= 10)) {
                             s = s.replace(";", "");
                             Object[] arr = Arrays.stream(s.split(" ")).toArray();
+
+                            // Horizon
                             Horizon.x = Integer.valueOf((String) arr[0]);
                             Horizon.y = Integer.valueOf((String) arr[1]);
                             Horizon.z = Integer.valueOf((String) arr[2]);
@@ -55,13 +58,19 @@ public class ArduinoHandler {
                             Horizon.x -= Horizon.gyCenterRollTrim;
                             Horizon.y -= Horizon.gyCenterPitchTrim;
                             Horizon.z -= Horizon.gyCenterInvertedTrim;
+                            // END Horizon
+
+                            // BMP280
+                            BMP280.altitude = Float.valueOf((String) arr[3]);
+                            BMP280.pressure = Float.valueOf((String) arr[4]);
+                            BMP280.temperature = Float.valueOf((String) arr[5]);
+                            // END BMP280
 
                             break;
                         }
                     }
                 }
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }).start();

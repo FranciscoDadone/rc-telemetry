@@ -88,6 +88,11 @@ public class MainFrame extends JFrame {
         new Thread(() -> {
             while(true) {
                 updateHorizon();
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
             }
         }).start();
     }
@@ -95,10 +100,9 @@ public class MainFrame extends JFrame {
     private void updateHorizon() {
         int tempGyX = Horizon.x;
         int tempGyY = Horizon.y;
-//        int tempGyZ = Horizon.z;
+        int tempGyZ = Horizon.z;
 
-//        if (Horizon.gyLeftInvertedTrim != 0 && Horizon.z < 0) tempGyZ = (Math.abs(Horizon.z) * 90) / Horizon.gyLeftInvertedTrim;
-//        if (Horizon.gyLeftInvertedTrim != 0 && Horizon.z >= 0) tempGyZ = (Math.abs(Horizon.z) * 90) / Horizon.gyRightInvertedTrim;
+        if (Horizon.gyLeftInvertedTrim != 0) tempGyZ = (Math.abs(Horizon.z) * -90) / Horizon.gyLeftInvertedTrim;
 
         if (Horizon.gyLeftTrim != 0 && Horizon.x < 0) tempGyX = (Math.abs(Horizon.x) * 90) / Horizon.gyLeftTrim;
         if (Horizon.gyRightTrim != 0 && Horizon.x >= 0) tempGyX = (Math.abs(Horizon.x) * 90) / Horizon.gyRightTrim;
@@ -106,6 +110,8 @@ public class MainFrame extends JFrame {
         if (Horizon.gyDownTrim != 0 && Horizon.y >= 0) tempGyY = (Math.abs(Horizon.y) * -55) / Horizon.gyDownTrim;
         if (Horizon.gyUpTrim != 0 && Horizon.y < 0) tempGyY = (Math.abs(Horizon.y) * -55) / Horizon.gyUpTrim;
 
-        ah.setAttitude(tempGyX, (tempGyY != 0) ? tempGyY : 1);
+        boolean isInverted = tempGyZ > 90;
+
+        ah.setAttitude((isInverted) ? -tempGyX - 180 : tempGyX, (tempGyY != 0) ? tempGyY : 1);
     }
 }
