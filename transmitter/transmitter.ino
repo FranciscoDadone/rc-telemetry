@@ -124,7 +124,7 @@ void loop() {
   Serial.print (" ");
   Serial.print (ay,DEC);
   Serial.print (" ");
-  //Serial.print (az,DEC);  
+  Serial.print (az,DEC);  
   Serial.print (" ");
 
   /*
@@ -136,13 +136,14 @@ void loop() {
   Serial.print (gz,DEC);  
   */
 
-
+/*
   // Magnetometer
   Serial.print (mx+200,DEC); 
   Serial.print (" ");
   Serial.print (my-70,DEC);
   Serial.print (" ");
   Serial.print (mz-700,DEC);  
+*/
 
 /*
   Serial.print("Altitude: ");

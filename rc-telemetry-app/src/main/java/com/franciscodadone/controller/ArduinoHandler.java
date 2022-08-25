@@ -1,14 +1,13 @@
 package com.franciscodadone.controller;
 
 import com.fazecast.jSerialComm.SerialPort;
+import com.franciscodadone.model.Horizon;
 
 import java.util.Arrays;
 
 public class ArduinoHandler {
 
     public static SerialPort serialPort;
-    public static int gyX;
-    public static int gyY;
 
     public static boolean connect() {
         SerialPort[] AvailablePorts = SerialPort.getCommPorts();
@@ -40,7 +39,6 @@ public class ArduinoHandler {
         new Thread(() -> {
             try {
                 while (true) {
-
                     byte[] readBuffer = new byte[100];
                     serialPort.readBytes(readBuffer, readBuffer.length);
 
@@ -50,9 +48,14 @@ public class ArduinoHandler {
                         if (s.startsWith(";") && s.endsWith(";") && (s.length() >= 10)) {
                             s = s.replace(";", "");
                             Object[] arr = Arrays.stream(s.split(" ")).toArray();
-                            gyX = Integer.valueOf((String) arr[0]);
-                            gyY = Integer.valueOf((String) arr[1]);
-//                            updateHorizon();
+                            Horizon.x = Integer.valueOf((String) arr[0]);
+                            Horizon.y = Integer.valueOf((String) arr[1]);
+                            Horizon.z = Integer.valueOf((String) arr[2]);
+
+                            Horizon.x -= Horizon.gyCenterRollTrim;
+                            Horizon.y -= Horizon.gyCenterPitchTrim;
+                            Horizon.z -= Horizon.gyCenterInvertedTrim;
+
                             break;
                         }
                     }

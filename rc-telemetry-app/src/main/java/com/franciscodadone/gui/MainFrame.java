@@ -1,17 +1,14 @@
 package com.franciscodadone.gui;
 
-import com.fazecast.jSerialComm.SerialPort;
 import com.franciscodadone.controller.ArduinoHandler;
+import com.franciscodadone.controller.ConfigurationHandler;
+import com.franciscodadone.model.Horizon;
 import com.github.kkieffer.jcirculargauges.JArtificialHorizonGauge;
 import com.github.kkieffer.jcirculargauges.JCompass;
 import com.github.kkieffer.jcirculargauges.JSpeedometer;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.Arrays;
-
 public class MainFrame extends JFrame {
     private JPanel mainPanel;
     private JPanel graphsPanel;
@@ -28,12 +25,7 @@ public class MainFrame extends JFrame {
     private JButton setGyroUPButton;
     private JButton setGyroDOWNButton;
 
-    private int gyCenterHorizontalTrim;
-    private int gyCenterVerticalTrim;
-    private int gyRightTrim;
-    private int gyLeftTrim;
-    private int gyUpTrim;
-    private int gyDownTrim;
+
 
     private JArtificialHorizonGauge ah;
 
@@ -62,29 +54,35 @@ public class MainFrame extends JFrame {
 
         this.pack();
 
-
-
-//        MySerialPort.isOpen()
-
         setGyroCENTERButton.addActionListener(e -> {
-            gyCenterHorizontalTrim = ArduinoHandler.gyX;
-            gyCenterVerticalTrim = ArduinoHandler.gyY;
+            Horizon.gyCenterRollTrim = Horizon.x;
+            Horizon.gyCenterPitchTrim = Horizon.y;
+            Horizon.gyCenterInvertedTrim = Horizon.z;
+            ConfigurationHandler.update();
         });
 
         setGyroDOWNButton.addActionListener(e -> {
-            gyDownTrim = ArduinoHandler.gyY;
+            Horizon.gyDownTrim = Horizon.y;
+            Horizon.gyDownInvertedTrim = Horizon.z;
+            ConfigurationHandler.update();
         });
 
         setGyroUPButton.addActionListener(e -> {
-            gyUpTrim = ArduinoHandler.gyY;
+            Horizon.gyUpTrim = Horizon.y;
+            Horizon.gyUpInvertedTrim = Horizon.z;
+            ConfigurationHandler.update();
         });
 
         setGyroLEFTButton.addActionListener(e -> {
-            gyLeftTrim = ArduinoHandler.gyX;
+            Horizon.gyLeftTrim = Horizon.x;
+            Horizon.gyLeftInvertedTrim = Horizon.z;
+            ConfigurationHandler.update();
         });
 
         setGyroRIGHTButton.addActionListener(e -> {
-            gyRightTrim = ArduinoHandler.gyX;
+            Horizon.gyRightTrim = Horizon.x;
+            Horizon.gyRightInvertedTrim = Horizon.z;
+            ConfigurationHandler.update();
         });
 
         new Thread(() -> {
@@ -95,16 +93,18 @@ public class MainFrame extends JFrame {
     }
 
     private void updateHorizon() {
-        ArduinoHandler.gyX -= gyCenterHorizontalTrim;
-        ArduinoHandler.gyY -= gyCenterHorizontalTrim;
-        int tempGyX = ArduinoHandler.gyX;
-        int tempGyY = ArduinoHandler.gyY;
+        int tempGyX = Horizon.x;
+        int tempGyY = Horizon.y;
+//        int tempGyZ = Horizon.z;
 
-        if (gyLeftTrim != 0 && ArduinoHandler.gyX < 0) tempGyX = (Math.abs(ArduinoHandler.gyX) * 90) / gyLeftTrim;
-        if (gyRightTrim != 0 && ArduinoHandler.gyX >= 0) tempGyX = (Math.abs(ArduinoHandler.gyX) * 90) / gyRightTrim;
+//        if (Horizon.gyLeftInvertedTrim != 0 && Horizon.z < 0) tempGyZ = (Math.abs(Horizon.z) * 90) / Horizon.gyLeftInvertedTrim;
+//        if (Horizon.gyLeftInvertedTrim != 0 && Horizon.z >= 0) tempGyZ = (Math.abs(Horizon.z) * 90) / Horizon.gyRightInvertedTrim;
 
-        if (gyDownTrim != 0 && ArduinoHandler.gyY >= 0) tempGyY = (Math.abs(ArduinoHandler.gyY) * -55) / gyDownTrim;
-        if (gyUpTrim != 0 && ArduinoHandler.gyY < 0) tempGyY = (Math.abs(ArduinoHandler.gyY) * -55) / gyUpTrim;
+        if (Horizon.gyLeftTrim != 0 && Horizon.x < 0) tempGyX = (Math.abs(Horizon.x) * 90) / Horizon.gyLeftTrim;
+        if (Horizon.gyRightTrim != 0 && Horizon.x >= 0) tempGyX = (Math.abs(Horizon.x) * 90) / Horizon.gyRightTrim;
+
+        if (Horizon.gyDownTrim != 0 && Horizon.y >= 0) tempGyY = (Math.abs(Horizon.y) * -55) / Horizon.gyDownTrim;
+        if (Horizon.gyUpTrim != 0 && Horizon.y < 0) tempGyY = (Math.abs(Horizon.y) * -55) / Horizon.gyUpTrim;
 
         ah.setAttitude(tempGyX, (tempGyY != 0) ? tempGyY : 1);
     }
