@@ -1,6 +1,7 @@
 package com.franciscodadone.controller;
 
 import com.fazecast.jSerialComm.SerialPort;
+import com.franciscodadone.model.Accelerometer;
 import com.franciscodadone.model.BMP280;
 import com.franciscodadone.model.Horizon;
 
@@ -59,6 +60,11 @@ public class ArduinoHandler {
                             Horizon.y -= Horizon.gyCenterPitchTrim;
                             Horizon.z -= Horizon.gyCenterInvertedTrim;
                             // END Horizon
+
+                            // Accelerometer
+                            Accelerometer.z = Integer.valueOf((String) arr[6]) / 1000;
+                            if (Math.abs(Accelerometer.z) > Accelerometer.maxZ) Accelerometer.maxZ = Math.abs(Accelerometer.z);
+                            // END Accelerometer
 
                             // BMP280
                             BMP280.altitude = Float.valueOf((String) arr[3]);

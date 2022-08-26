@@ -1,22 +1,14 @@
 package com.franciscodadone.gui;
 
-import com.franciscodadone.controller.ArduinoHandler;
 import com.franciscodadone.controller.ConfigurationHandler;
+import com.franciscodadone.model.Accelerometer;
 import com.franciscodadone.model.BMP280;
 import com.franciscodadone.model.Horizon;
 import com.franciscodadone.utils.Util;
 import com.github.kkieffer.jcirculargauges.JArtificialHorizonGauge;
 import com.github.kkieffer.jcirculargauges.JCompass;
 import com.github.kkieffer.jcirculargauges.JSpeedometer;
-import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
-import org.jfree.chart.JFreeChart;
-import org.jfree.chart.block.BlockBorder;
-import org.jfree.chart.plot.PlotOrientation;
-import org.jfree.chart.plot.XYPlot;
-import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
-import org.jfree.chart.title.TextTitle;
-import org.jfree.data.xy.XYDataset;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 
@@ -39,6 +31,7 @@ public class MainFrame extends JFrame {
     private JButton setGyroDOWNButton;
     private JPanel temperatureGraphPanel;
     private JPanel pressureGraphPanel;
+    private JPanel accelerometerGraphPanel;
 
 
     public static JArtificialHorizonGauge ah;
@@ -122,25 +115,44 @@ public class MainFrame extends JFrame {
         pressureGraphPanel.repaint();
         pressureGraphPanel.validate();
         // END Pressure chart
+        // Accelerometer
+        XYSeries accelerometerMaxSeries = new XYSeries("accMax");
+        XYSeriesCollection accelerometerDataset = new XYSeriesCollection();
+        accelerometerDataset.addSeries(accelerometerMaxSeries);
+        ChartPanel accelerometerChartPanel = new ChartPanel(Util.createChart(accelerometerDataset, "Accelerometer", "Time", "Gs"));
+        accelerometerChartPanel.validate();
+        accelerometerChartPanel.setPreferredSize(accelerometerGraphPanel.getPreferredSize());
+        accelerometerGraphPanel.add(accelerometerChartPanel, BorderLayout.CENTER);
+        accelerometerGraphPanel.repaint();
+        accelerometerGraphPanel.validate();
+        // END Accelerometer
 
         new Thread(() -> {
-            int i = 0;
-            int i2 = 0;
+            int i = -1;
+            int i2 = -1;
             while (true) {
-                if (BMP280.temperature != 0) temperatureSeries.add(i, BMP280.temperature);
-                if (BMP280.altitude != 0) altitudeSeries.add(i, (int) BMP280.altitude);
-                if (i2 == 100) {
-                    altitudeSeries.remove(0);
-                    temperatureSeries.remove(0);
-                    i2 = 99;
+                i++;
+                i2++;
+                if (i != 0) {
+                    temperatureSeries.add(i, BMP280.temperature);
+                    altitudeSeries.add(i, (int) BMP280.altitude);
+                    accelerometerMaxSeries.add(i, Accelerometer.maxZ);
+
+                    if (i2 == 100) {
+                        altitudeSeries.remove(0);
+                        temperatureSeries.remove(0);
+                        accelerometerMaxSeries.remove(0);
+                        i2 = 99;
+                    }
+
+                    Accelerometer.maxZ = 0;
+
                 }
                 try {
                     Thread.sleep(1000);
                 } catch (InterruptedException e) {
                     throw new RuntimeException(e);
                 }
-                i++;
-                i2++;
             }
         }).start();
 
