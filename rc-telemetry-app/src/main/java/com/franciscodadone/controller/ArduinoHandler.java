@@ -64,6 +64,9 @@ public class ArduinoHandler {
                             BMP280.altitude = Float.valueOf((String) arr[3]);
                             BMP280.pressure = Float.valueOf((String) arr[4]);
                             BMP280.temperature = Float.valueOf((String) arr[5]);
+
+                            BMP280.altitude -= BMP280.altitudeTrim;
+                            if (BMP280.altitude < 0) BMP280.altitude = 0;
                             // END BMP280
 
                             break;

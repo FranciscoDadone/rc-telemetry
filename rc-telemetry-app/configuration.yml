@@ -1,11 +1,12 @@
 H_inverted_up_trim: -3533
+altitude_trim: 95
 H_pitch_center_trim: 57
 H_right_trim: -4107
 H_inverted_left_trim: -4005
 H_inverted_down_trim: -4314
 H_left_trim: 4090
 H_down_trim: -4030
-H_inverted_center_trim: 4481
-H_roll_center_trim: -59
+H_inverted_center_trim: 4477
+H_roll_center_trim: -64
 H_up_trim: 4028
 H_inverted_right_trim: -3901

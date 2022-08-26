@@ -67,7 +67,7 @@ void setup() {
   // Configure gyroscope range
   I2CwriteByte(MPU9250_ADDRESS, 27, GYRO_FULL_SCALE_1000_DPS);
   // Configure accelerometers range
-  I2CwriteByte(MPU9250_ADDRESS, 28, ACC_FULL_SCALE_8_G);
+  I2CwriteByte(MPU9250_ADDRESS, 28, ACC_FULL_SCALE_16_G);
   // Set by pass mode for the magnetometers
   I2CwriteByte(MPU9250_ADDRESS, 0x37, 0x02);
   
@@ -89,8 +89,10 @@ void interrupt() {
 
 int16_t ax, ay, az, gy, gx, gz, mx, my, mz;
 
+int16_t maxG, minG;
+
 void loop() {
-  while (!intFlag); // while
+  while (!intFlag);
   intFlag = false;
  
   uint8_t Buf[14];
@@ -120,15 +122,11 @@ void loop() {
   my =- (Mag[1]<<8 | Mag[0]);
   mz =- (Mag[5]<<8 | Mag[4]);
 
-
-//  Serial.println(az);
-//  Serial.println(gx);
-//  Serial.println();
-
   sendData();
 }
 
 void sendData() {
+  // Gyro
   Serial.print(";");
   Serial.print (ax,DEC); 
   Serial.print (" ");
@@ -143,7 +141,11 @@ void sendData() {
   Serial.print(mySensorA.readFloatPressure() / 100, 2);
   Serial.print(" ");
   Serial.print(mySensorA.readTempC(), 2);
-
+  Serial.print(" ");
+  
+  // Accelerometer
+  Serial.print(gz);
+  
   /*
   // Gyroscope
   Serial.print (gx,DEC); 

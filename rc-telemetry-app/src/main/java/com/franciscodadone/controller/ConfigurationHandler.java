@@ -2,6 +2,7 @@ package com.franciscodadone.controller;
 
 import com.esotericsoftware.yamlbeans.YamlReader;
 import com.esotericsoftware.yamlbeans.YamlWriter;
+import com.franciscodadone.model.BMP280;
 import com.franciscodadone.model.Horizon;
 
 import java.io.FileReader;
@@ -27,6 +28,8 @@ public class ConfigurationHandler {
         map.put("H_left_trim", Horizon.gyLeftTrim);
         map.put("H_up_trim", Horizon.gyUpTrim);
         map.put("H_down_trim", Horizon.gyDownTrim);
+
+        map.put("altitude_trim", (int) BMP280.altitudeTrim);
 
         try {
             YamlWriter writer = new YamlWriter(new FileWriter("configuration.yml"));
@@ -55,6 +58,8 @@ public class ConfigurationHandler {
             Horizon.gyLeftTrim = Integer.valueOf(String.valueOf(hm.get("H_left_trim")));
             Horizon.gyUpTrim = Integer.valueOf(String.valueOf(hm.get("H_up_trim")));
             Horizon.gyDownTrim = Integer.valueOf(String.valueOf(hm.get("H_down_trim")));
+
+            BMP280.altitudeTrim = Integer.valueOf(String.valueOf(hm.get("altitude_trim")));
 
         } catch (Exception e) {
             throw new RuntimeException(e);

@@ -2,10 +2,23 @@ package com.franciscodadone.gui;
 
 import com.franciscodadone.controller.ArduinoHandler;
 import com.franciscodadone.controller.ConfigurationHandler;
+import com.franciscodadone.model.BMP280;
 import com.franciscodadone.model.Horizon;
+import com.franciscodadone.utils.Util;
 import com.github.kkieffer.jcirculargauges.JArtificialHorizonGauge;
 import com.github.kkieffer.jcirculargauges.JCompass;
 import com.github.kkieffer.jcirculargauges.JSpeedometer;
+import org.jfree.chart.ChartFactory;
+import org.jfree.chart.ChartPanel;
+import org.jfree.chart.JFreeChart;
+import org.jfree.chart.block.BlockBorder;
+import org.jfree.chart.plot.PlotOrientation;
+import org.jfree.chart.plot.XYPlot;
+import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
+import org.jfree.chart.title.TextTitle;
+import org.jfree.data.xy.XYDataset;
+import org.jfree.data.xy.XYSeries;
+import org.jfree.data.xy.XYSeriesCollection;
 
 import javax.swing.*;
 import java.awt.*;
@@ -24,10 +37,11 @@ public class MainFrame extends JFrame {
     private JButton setGyroLEFTButton;
     private JButton setGyroUPButton;
     private JButton setGyroDOWNButton;
+    private JPanel temperatureGraphPanel;
+    private JPanel pressureGraphPanel;
 
 
-
-    private JArtificialHorizonGauge ah;
+    public static JArtificialHorizonGauge ah;
 
     public MainFrame() {
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -46,7 +60,6 @@ public class MainFrame extends JFrame {
         g.setCourse(0);
         compassPanel.add(g);
 
-
         JSpeedometer speedometer = new JSpeedometer(10, "km");
         speedometer.setColors(Color.RED, null, Color.BLACK);
         speedometer.setSpeed(0);
@@ -58,6 +71,7 @@ public class MainFrame extends JFrame {
             Horizon.gyCenterRollTrim = Horizon.x;
             Horizon.gyCenterPitchTrim = Horizon.y;
             Horizon.gyCenterInvertedTrim = Horizon.z;
+            BMP280.altitudeTrim = BMP280.altitude;
             ConfigurationHandler.update();
         });
 
@@ -85,9 +99,55 @@ public class MainFrame extends JFrame {
             ConfigurationHandler.update();
         });
 
+
+        // Temperature chart
+        XYSeries temperatureSeries = new XYSeries("t");
+        XYSeriesCollection temperatureDataset = new XYSeriesCollection();
+        temperatureDataset.addSeries(temperatureSeries);
+        ChartPanel temperatureChartPanel = new ChartPanel(Util.createChart(temperatureDataset, "Temperature", "Time", "ºC"));
+        temperatureChartPanel.validate();
+        temperatureChartPanel.setPreferredSize(temperatureGraphPanel.getPreferredSize());
+        temperatureGraphPanel.add(temperatureChartPanel, BorderLayout.CENTER);
+        temperatureGraphPanel.repaint();
+        temperatureGraphPanel.validate();
+        // END Temperature chart
+        // Altitude chart
+        XYSeries altitudeSeries = new XYSeries("a");
+        XYSeriesCollection altitudeDataset = new XYSeriesCollection();
+        altitudeDataset.addSeries(altitudeSeries);
+        ChartPanel pressureChartPanel = new ChartPanel(Util.createChart(altitudeDataset, "Altitude", "Time", "Meters"));
+        pressureChartPanel.validate();
+        pressureChartPanel.setPreferredSize(pressureGraphPanel.getPreferredSize());
+        pressureGraphPanel.add(pressureChartPanel, BorderLayout.CENTER);
+        pressureGraphPanel.repaint();
+        pressureGraphPanel.validate();
+        // END Pressure chart
+
+        new Thread(() -> {
+            int i = 0;
+            int i2 = 0;
+            while (true) {
+                if (BMP280.temperature != 0) temperatureSeries.add(i, BMP280.temperature);
+                if (BMP280.altitude != 0) altitudeSeries.add(i, (int) BMP280.altitude);
+                if (i2 == 100) {
+                    altitudeSeries.remove(0);
+                    temperatureSeries.remove(0);
+                    i2 = 99;
+                }
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+                i++;
+                i2++;
+            }
+        }).start();
+
+
         new Thread(() -> {
             while(true) {
-                updateHorizon();
+                Util.updateHorizon();
                 try {
                     Thread.sleep(100);
                 } catch (InterruptedException e) {
@@ -95,23 +155,5 @@ public class MainFrame extends JFrame {
                 }
             }
         }).start();
-    }
-
-    private void updateHorizon() {
-        int tempGyX = Horizon.x;
-        int tempGyY = Horizon.y;
-        int tempGyZ = Horizon.z;
-
-        if (Horizon.gyLeftInvertedTrim != 0) tempGyZ = (Math.abs(Horizon.z) * -90) / Horizon.gyLeftInvertedTrim;
-
-        if (Horizon.gyLeftTrim != 0 && Horizon.x < 0) tempGyX = (Math.abs(Horizon.x) * 90) / Horizon.gyLeftTrim;
-        if (Horizon.gyRightTrim != 0 && Horizon.x >= 0) tempGyX = (Math.abs(Horizon.x) * 90) / Horizon.gyRightTrim;
-
-        if (Horizon.gyDownTrim != 0 && Horizon.y >= 0) tempGyY = (Math.abs(Horizon.y) * -55) / Horizon.gyDownTrim;
-        if (Horizon.gyUpTrim != 0 && Horizon.y < 0) tempGyY = (Math.abs(Horizon.y) * -55) / Horizon.gyUpTrim;
-
-        boolean isInverted = tempGyZ > 90;
-
-        ah.setAttitude((isInverted) ? -tempGyX - 180 : tempGyX, (tempGyY != 0) ? tempGyY : 1);
     }
 }
