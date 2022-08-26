@@ -62,7 +62,7 @@ public class ArduinoHandler {
                             // END Horizon
 
                             // Accelerometer
-                            Accelerometer.z = Integer.valueOf((String) arr[6]) / 1000;
+                            Accelerometer.z = Integer.valueOf((String) arr[6]);
                             if (Math.abs(Accelerometer.z) > Accelerometer.maxZ) Accelerometer.maxZ = Math.abs(Accelerometer.z);
                             // END Accelerometer
 

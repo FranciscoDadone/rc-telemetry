@@ -20,10 +20,9 @@ public class MainFrame extends JFrame {
     private JPanel horizonPanel;
     private JPanel subPanelIzq;
     private JPanel subPanelDer;
-    private JPanel speedPanel;
-    private JPanel heightPanel;
+    private JPanel altimeterPanel;
+    private JPanel gPanel;
     private JPanel compassPanel;
-    private JPanel gForcePanel;
     private JButton setGyroCENTERButton;
     private JButton setGyroRIGHTButton;
     private JButton setGyroLEFTButton;
@@ -32,9 +31,14 @@ public class MainFrame extends JFrame {
     private JPanel temperatureGraphPanel;
     private JPanel pressureGraphPanel;
     private JPanel accelerometerGraphPanel;
+    private JPanel compassPanel2;
 
 
     public static JArtificialHorizonGauge ah;
+    public static JCompass compass;
+    public static JSpeedometer altimeter;
+    public static JSpeedometer gForce;
+    public static JEmptyGauge temperature;
 
     public MainFrame() {
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -44,20 +48,29 @@ public class MainFrame extends JFrame {
         this.setContentPane(mainPanel);
 
         ah = new JArtificialHorizonGauge(1.5);
-        ah.setColors(Color.WHITE, new Color(0, 50, 200), new Color(100, 45, 30), new Color(0, 0, 100));
-        horizonPanel.add(ah);
+        ah.setColors(Color.WHITE, new Color(0, 0, 0), new Color(124, 69, 57), new Color(75, 113, 199));
+        horizonPanel.add(ah, BorderLayout.CENTER);
         ah.setAttitude(1, 1);
 
-        JCompass g = new JCompass(false);
-        g.setColors(Color.WHITE, Color.YELLOW, null, Color.BLACK);
-        g.setCourse(0);
-        compassPanel.add(g);
 
-        JSpeedometer speedometer = new JSpeedometer(10, "km");
-        speedometer.setColors(Color.RED, null, Color.BLACK);
-        speedometer.setSpeed(0);
-        speedPanel.add(speedometer);
+        temperature = new JEmptyGauge(1, "ºC");
+        temperature.setColors(Color.RED, new Color(0,0,0), new Color(16, 16, 16));
+        compassPanel2.add(temperature);
+        compassPanel2.setPreferredSize(new Dimension(100,100));
 
+        compass = new JCompass(false);
+        compass.setColors(Color.WHITE, Color.YELLOW, null, new Color(16, 16, 16));
+        compassPanel.add(compass);
+        compassPanel.setPreferredSize(new Dimension(100,100));
+
+        altimeter = new JSpeedometer(100, "meters");
+        altimeter.setColors(Color.RED, new Color(0,0,0), new Color(16, 16, 16));
+        altimeterPanel.add(altimeter, BorderLayout.CENTER);
+
+        gForce = new JSpeedometer(1, "Gs");
+        gForce.setColors(Color.RED, new Color(0,0,0), new Color(16, 16, 16));
+        gPanel.add(gForce, BorderLayout.CENTER);
+//        gPanel.setPreferredSize(gForce.getPreferredSize());
         this.pack();
 
         setGyroCENTERButton.addActionListener(e -> {
@@ -138,15 +151,13 @@ public class MainFrame extends JFrame {
                     altitudeSeries.add(i, (int) BMP280.altitude);
                     accelerometerMaxSeries.add(i, Accelerometer.maxZ);
 
-                    if (i2 == 100) {
+                    if (i2 == 60) {
                         altitudeSeries.remove(0);
                         temperatureSeries.remove(0);
                         accelerometerMaxSeries.remove(0);
-                        i2 = 99;
+                        i2 = 59;
                     }
-
                     Accelerometer.maxZ = 0;
-
                 }
                 try {
                     Thread.sleep(1000);
@@ -160,6 +171,9 @@ public class MainFrame extends JFrame {
         new Thread(() -> {
             while(true) {
                 Util.updateHorizon();
+                Util.updateAltimeter();
+                Util.updateGForce();
+                Util.updateTemperature();
                 try {
                     Thread.sleep(100);
                 } catch (InterruptedException e) {

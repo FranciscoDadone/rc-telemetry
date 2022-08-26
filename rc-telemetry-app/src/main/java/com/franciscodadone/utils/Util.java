@@ -1,6 +1,8 @@
 package com.franciscodadone.utils;
 
 import com.franciscodadone.gui.MainFrame;
+import com.franciscodadone.model.Accelerometer;
+import com.franciscodadone.model.BMP280;
 import com.franciscodadone.model.Horizon;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
@@ -29,6 +31,18 @@ public class Util {
         boolean isInverted = tempGyZ > 90;
 
         MainFrame.ah.setAttitude((isInverted) ? -tempGyX - 180 : tempGyX, (tempGyY != 0) ? tempGyY : 1);
+    }
+
+    public static void updateAltimeter() {
+        MainFrame.altimeter.setSpeed(BMP280.altitude);
+    }
+
+    public static void updateGForce() {
+        MainFrame.gForce.setSpeed(Accelerometer.maxZ / 1000);
+    }
+
+    public static void updateTemperature() {
+        MainFrame.temperature.setSpeed(BMP280.temperature);
     }
 
     public static JFreeChart createChart(XYDataset dataset, String title, String xAxisLabel, String yAxisLabel) {

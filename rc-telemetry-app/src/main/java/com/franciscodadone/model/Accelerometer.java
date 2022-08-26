@@ -1,6 +1,6 @@
 package com.franciscodadone.model;
 
 public class Accelerometer {
-    public static int z;
-    public static int maxZ;
+    public static float z;
+    public static float maxZ;
 }
