@@ -1,9 +1,10 @@
 package com.franciscodadone.gui;
 
-import com.franciscodadone.controller.ConfigurationHandler;
+import com.fazecast.jSerialComm.SerialPort;
+import com.franciscodadone.controller.ArduinoHandler;
 import com.franciscodadone.model.Accelerometer;
 import com.franciscodadone.model.BMP280;
-import com.franciscodadone.model.Horizon;
+import com.franciscodadone.utils.Global;
 import com.franciscodadone.utils.Util;
 import com.github.kkieffer.jcirculargauges.JArtificialHorizonGauge;
 import com.github.kkieffer.jcirculargauges.JCompass;
@@ -14,6 +15,8 @@ import org.jfree.data.xy.XYSeriesCollection;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.Arrays;
+
 public class MainFrame extends JFrame {
     private JPanel mainPanel;
     private JPanel graphsPanel;
@@ -31,21 +34,38 @@ public class MainFrame extends JFrame {
     private JPanel temperatureGraphPanel;
     private JPanel pressureGraphPanel;
     private JPanel accelerometerGraphPanel;
-    private JPanel compassPanel2;
-
-
+    private JPanel temperaturePanel;
+    private JButton calibrateButton;
+    private JComboBox comPortComboBox;
+    private JButton connectButton;
+    private JPanel pressurePanel;
     public static JArtificialHorizonGauge ah;
     public static JCompass compass;
     public static JSpeedometer altimeter;
     public static JSpeedometer gForce;
     public static JEmptyGauge temperature;
+    public static JEmptyGauge pressure;
 
     public MainFrame() {
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setVisible(true);
         this.setExtendedState(JFrame.MAXIMIZED_BOTH);
+        this.setMinimumSize(new Dimension(1100, 700));
         this.setTitle("RC Telemetry");
         this.setContentPane(mainPanel);
+
+        Object[] ports = Arrays.stream(SerialPort.getCommPorts()).toArray();
+        for (int i = 0; i < ports.length; i++) {
+            comPortComboBox.addItem(ports[i]);
+        }
+
+        connectButton.addActionListener((e) -> {
+            ArduinoHandler.disconnect();
+            boolean started = ArduinoHandler.connect((SerialPort)comPortComboBox.getSelectedItem());
+            if (!started) return;
+            ArduinoHandler.startReading();
+            Global.appStarted = true;
+        });
 
         ah = new JArtificialHorizonGauge(1.5);
         ah.setColors(Color.WHITE, new Color(0, 0, 0), new Color(124, 69, 57), new Color(75, 113, 199));
@@ -53,10 +73,15 @@ public class MainFrame extends JFrame {
         ah.setAttitude(1, 1);
 
 
-        temperature = new JEmptyGauge(1, "ºC");
+        temperature = new JEmptyGauge(1, "ºC", 9.0F);
         temperature.setColors(Color.RED, new Color(0,0,0), new Color(16, 16, 16));
-        compassPanel2.add(temperature);
-        compassPanel2.setPreferredSize(new Dimension(100,100));
+        temperaturePanel.add(temperature);
+        temperaturePanel.setPreferredSize(new Dimension(100,100));
+
+        pressure = new JEmptyGauge(1, "hPa", 6.0F);
+        pressure.setColors(Color.RED, new Color(0,0,0), new Color(16, 16, 16));
+        pressurePanel.add(pressure);
+        pressurePanel.setPreferredSize(new Dimension(100,100));
 
         compass = new JCompass(false);
         compass.setColors(Color.WHITE, Color.YELLOW, null, new Color(16, 16, 16));
@@ -70,39 +95,10 @@ public class MainFrame extends JFrame {
         gForce = new JSpeedometer(1, "Gs");
         gForce.setColors(Color.RED, new Color(0,0,0), new Color(16, 16, 16));
         gPanel.add(gForce, BorderLayout.CENTER);
-//        gPanel.setPreferredSize(gForce.getPreferredSize());
         this.pack();
 
-        setGyroCENTERButton.addActionListener(e -> {
-            Horizon.gyCenterRollTrim = Horizon.x;
-            Horizon.gyCenterPitchTrim = Horizon.y;
-            Horizon.gyCenterInvertedTrim = Horizon.z;
-            BMP280.altitudeTrim = BMP280.altitude;
-            ConfigurationHandler.update();
-        });
-
-        setGyroDOWNButton.addActionListener(e -> {
-            Horizon.gyDownTrim = Horizon.y;
-            Horizon.gyDownInvertedTrim = Horizon.z;
-            ConfigurationHandler.update();
-        });
-
-        setGyroUPButton.addActionListener(e -> {
-            Horizon.gyUpTrim = Horizon.y;
-            Horizon.gyUpInvertedTrim = Horizon.z;
-            ConfigurationHandler.update();
-        });
-
-        setGyroLEFTButton.addActionListener(e -> {
-            Horizon.gyLeftTrim = Horizon.x;
-            Horizon.gyLeftInvertedTrim = Horizon.z;
-            ConfigurationHandler.update();
-        });
-
-        setGyroRIGHTButton.addActionListener(e -> {
-            Horizon.gyRightTrim = Horizon.x;
-            Horizon.gyRightInvertedTrim = Horizon.z;
-            ConfigurationHandler.update();
+        calibrateButton.addActionListener(e -> {
+            new CalibrationFrame();
         });
 
 
@@ -144,20 +140,22 @@ public class MainFrame extends JFrame {
             int i = -1;
             int i2 = -1;
             while (true) {
-                i++;
-                i2++;
-                if (i != 0) {
-                    temperatureSeries.add(i, BMP280.temperature);
-                    altitudeSeries.add(i, (int) BMP280.altitude);
-                    accelerometerMaxSeries.add(i, Accelerometer.maxZ);
+                if (Global.appStarted) {
+                    i++;
+                    i2++;
+                    if (i != 0) {
+                        temperatureSeries.add(i, BMP280.temperature);
+                        altitudeSeries.add(i, (int) BMP280.altitude);
+                        accelerometerMaxSeries.add(i, Accelerometer.maxZ);
 
-                    if (i2 == 60) {
-                        altitudeSeries.remove(0);
-                        temperatureSeries.remove(0);
-                        accelerometerMaxSeries.remove(0);
-                        i2 = 59;
+                        if (i2 == 60) {
+                            altitudeSeries.remove(0);
+                            temperatureSeries.remove(0);
+                            accelerometerMaxSeries.remove(0);
+                            i2 = 59;
+                        }
+                        Accelerometer.maxZ = 0;
                     }
-                    Accelerometer.maxZ = 0;
                 }
                 try {
                     Thread.sleep(1000);
@@ -170,10 +168,13 @@ public class MainFrame extends JFrame {
 
         new Thread(() -> {
             while(true) {
-                Util.updateHorizon();
-                Util.updateAltimeter();
-                Util.updateGForce();
-                Util.updateTemperature();
+                if (Global.appStarted) {
+                    Util.updateHorizon();
+                    Util.updateAltimeter();
+                    Util.updateGForce();
+                    Util.updateTemperature();
+                    Util.updatePressure();
+                }
                 try {
                     Thread.sleep(100);
                 } catch (InterruptedException e) {

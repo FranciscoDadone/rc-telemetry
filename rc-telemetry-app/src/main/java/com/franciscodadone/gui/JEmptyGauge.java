@@ -13,8 +13,10 @@ public class JEmptyGauge extends JCircularGauge {
     private double currentSpeed;
     private Color indicatorColor;
     private int tickIncrement;
+    private float fontSize;
 
-    public JEmptyGauge(int increment, String unit) {
+    public JEmptyGauge(int increment, String unit, float fontSize) {
+        this.fontSize = fontSize;
         this.unit = unit;
         this.indicatorColor = Color.BLACK;
         this.dialCenterDivider = 14.0F;
@@ -70,7 +72,7 @@ public class JEmptyGauge extends JCircularGauge {
             if (i % majorTickIncrement == 0) {
                 g2d.setStroke(new BasicStroke(4.0F));
                 largeFont = g2d.getFont();
-                largeFont = largeFont.deriveFont(10.0F);
+                largeFont = largeFont.deriveFont(fontSize);
                 g2d.setFont(largeFont);
                 String label = String.valueOf((int)Math.round(speedLabel));
                 unitFontHeight = g2d.getFontMetrics().stringWidth(label);

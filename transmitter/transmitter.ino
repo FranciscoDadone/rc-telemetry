@@ -89,8 +89,6 @@ void interrupt() {
 
 int16_t ax, ay, az, gy, gx, gz, mx, my, mz;
 
-int16_t maxG, minG;
-
 void loop() {
   while (!intFlag);
   intFlag = false;
@@ -121,7 +119,14 @@ void loop() {
   mx =- (Mag[3]<<8 | Mag[2]);
   my =- (Mag[1]<<8 | Mag[0]);
   mz =- (Mag[5]<<8 | Mag[4]);
-
+/*
+  Serial.print(gy);
+  Serial.print("\t");
+  Serial.print(gx);
+  Serial.print("\t");
+  Serial.print(gz);
+  Serial.println("");
+*/
   sendData();
 }
 
@@ -144,7 +149,7 @@ void sendData() {
   Serial.print(" ");
   
   // Accelerometer
-  Serial.print(gz);
+  Serial.print(gx);
   
   /*
   // Gyroscope

@@ -45,6 +45,10 @@ public class Util {
         MainFrame.temperature.setSpeed(BMP280.temperature);
     }
 
+    public static void updatePressure() {
+        MainFrame.pressure.setSpeed(BMP280.pressure);
+    }
+
     public static JFreeChart createChart(XYDataset dataset, String title, String xAxisLabel, String yAxisLabel) {
         JFreeChart chart = ChartFactory.createXYLineChart(
                 title,
