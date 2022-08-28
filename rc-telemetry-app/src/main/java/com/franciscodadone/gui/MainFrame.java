@@ -18,7 +18,7 @@ public class MainFrame extends JFrame {
     private JPanel gPanel;
     private JPanel compassPanel;
     private JPanel temperatureGraphPanel;
-    private JPanel pressureGraphPanel;
+    private JPanel altitudeGraphPanel;
     private JPanel accelerometerGraphPanel;
     private JPanel temperaturePanel;
     private JButton calibrateButton;
@@ -29,6 +29,11 @@ public class MainFrame extends JFrame {
     private JLabel maxGLabel;
     private JLabel maxAltitudeLabel;
     private JLabel flightTimeLabel;
+    private JPanel altitudeSubPane;
+    private JPanel temperatureSubPane;
+    private JPanel gForceSubPane;
+    private JPanel altitudeSubPane2;
+    private JPanel pressureSubPane;
     private final JArtificialHorizonGauge ah;
     private final JCompass compass;
     private final JSpeedometer altimeter;
@@ -37,6 +42,7 @@ public class MainFrame extends JFrame {
     private final JEmptyGauge pressure;
     private final XYSeries temperatureSeries;
     private final XYSeries altitudeSeries;
+    private final XYSeries pressureSeries;
     private final XYSeries accelerometerMaxSeries;
 
     public MainFrame() {
@@ -82,34 +88,52 @@ public class MainFrame extends JFrame {
         XYSeriesCollection temperatureDataset = new XYSeriesCollection();
         temperatureDataset.addSeries(temperatureSeries);
         ChartPanel temperatureChartPanel = new ChartPanel(Util.createChart(temperatureDataset, "Temperature", "Time", "ºC"));
+        ChartPanel temperatureChartPanel1 = new ChartPanel(Util.createChart(temperatureDataset, "Temperature", "Time", "ºC"));;
         temperatureChartPanel.validate();
+        temperatureChartPanel1.validate();
         temperatureChartPanel.setPreferredSize(temperatureGraphPanel.getPreferredSize());
         temperatureGraphPanel.add(temperatureChartPanel, BorderLayout.CENTER);
+        temperatureSubPane.add(temperatureChartPanel1, BorderLayout.CENTER);
         temperatureGraphPanel.repaint();
         temperatureGraphPanel.validate();
+
         // END Temperature chart
         // Altitude chart
         altitudeSeries = new XYSeries("Altitude");
         XYSeriesCollection altitudeDataset = new XYSeriesCollection();
         altitudeDataset.addSeries(altitudeSeries);
-        ChartPanel pressureChartPanel = new ChartPanel(Util.createChart(altitudeDataset, "Altitude", "Time", "Meters"));
-        pressureChartPanel.validate();
-        pressureChartPanel.setPreferredSize(pressureGraphPanel.getPreferredSize());
-        pressureGraphPanel.add(pressureChartPanel, BorderLayout.CENTER);
-        pressureGraphPanel.repaint();
-        pressureGraphPanel.validate();
+        ChartPanel altitudeChartPanel = new ChartPanel(Util.createChart(altitudeDataset, "Altitude", "Time", "Meters"));
+        ChartPanel altitudeChartPanel1 = new ChartPanel(Util.createChart(altitudeDataset, "Altitude", "Time", "Meters"));
+        ChartPanel altitudeChartPanel2 = new ChartPanel(Util.createChart(altitudeDataset, "Altitude", "Time", "Meters"));
+        altitudeChartPanel.validate();
+        altitudeChartPanel.setPreferredSize(altitudeGraphPanel.getPreferredSize());
+        altitudeGraphPanel.add(altitudeChartPanel, BorderLayout.CENTER);
+        altitudeSubPane.add(altitudeChartPanel1, BorderLayout.CENTER);
+        altitudeSubPane2.add(altitudeChartPanel2, BorderLayout.CENTER);
+        altitudeGraphPanel.repaint();
+        altitudeGraphPanel.validate();
         // END Pressure chart
-        // Accelerometer
+        // Accelerometer chart
         accelerometerMaxSeries = new XYSeries("Acceleration");
         XYSeriesCollection accelerometerDataset = new XYSeriesCollection();
         accelerometerDataset.addSeries(accelerometerMaxSeries);
         ChartPanel accelerometerChartPanel = new ChartPanel(Util.createChart(accelerometerDataset, "Acceleration", "Time", "Gs"));
+        ChartPanel accelerometerChartPanel1 = new ChartPanel(Util.createChart(accelerometerDataset, "Acceleration", "Time", "Gs"));
         accelerometerChartPanel.validate();
         accelerometerChartPanel.setPreferredSize(accelerometerGraphPanel.getPreferredSize());
         accelerometerGraphPanel.add(accelerometerChartPanel, BorderLayout.CENTER);
+        gForceSubPane.add(accelerometerChartPanel1, BorderLayout.CENTER);
         accelerometerGraphPanel.repaint();
         accelerometerGraphPanel.validate();
-        // END Accelerometer
+        // END Accelerometer chart
+        // Pressure chart
+        pressureSeries = new XYSeries("Pressure");
+        XYSeriesCollection pressureDataset = new XYSeriesCollection();
+        pressureDataset.addSeries(pressureSeries);
+        ChartPanel pressureChartPanel = new ChartPanel(Util.createChart(pressureDataset, "Pressure", "Time", "hPa"));
+        accelerometerChartPanel.validate();
+        pressureSubPane.add(pressureChartPanel, BorderLayout.CENTER);
+        // END Pressure chart
 
         new MainFrameController(this);
     }
@@ -160,6 +184,10 @@ public class MainFrame extends JFrame {
 
     public JComboBox<Object> getComPortComboBox() {
         return comPortComboBox;
+    }
+
+    public XYSeries getPressureSeries() {
+        return pressureSeries;
     }
 
     public JLabel getMaxGLabel() {

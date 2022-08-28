@@ -23,7 +23,7 @@ public class MainFrameController {
     private void initController() {
         view.getCalibrateButton().addActionListener(e -> new CalibrationFrame());
         view.getResetGraphsButton().addActionListener(e -> resetGraphs());
-        view.getConnectButton().addActionListener((e) -> connectArduino());
+        view.getConnectButton().addActionListener(e -> connectArduino());
 
         Object[] ports = ArduinoHandler.getPorts();
         for (Object port : ports) view.getComPortComboBox().addItem(port);
@@ -39,6 +39,7 @@ public class MainFrameController {
                         view.getTemperatureSeries().add(i, BMP280.temperature);
                         view.getAltitudeSeries().add(i, (int) BMP280.altitude);
                         view.getAccelerometerMaxSeries().add(i, Accelerometer.maxZ);
+                        view.getPressureSeries().add(i, BMP280.pressure);
 
                         if (Accelerometer.maxGForceRegistered < Accelerometer.maxZ) Accelerometer.maxGForceRegistered = Accelerometer.maxZ;
                         view.getMaxGLabel().setText("Max Gs: " + Accelerometer.maxGForceRegistered + "G");
