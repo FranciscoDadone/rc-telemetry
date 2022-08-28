@@ -43,23 +43,24 @@ public class ConfigurationHandler {
     public static void read() {
         try {
             YamlReader r = new YamlReader(new FileReader("configuration.yml"));
+            //noinspection rawtypes
             HashMap hm = r.read(HashMap.class);
 
-            Horizon.gyCenterRollTrim = Integer.valueOf(String.valueOf(hm.get("H_roll_center_trim")));
-            Horizon.gyCenterPitchTrim = Integer.valueOf(String.valueOf(hm.get("H_pitch_center_trim")));
-            Horizon.gyCenterInvertedTrim = Integer.valueOf(String.valueOf(hm.get("H_inverted_center_trim")));
+            Horizon.gyCenterRollTrim = Integer.parseInt(String.valueOf(hm.get("H_roll_center_trim")));
+            Horizon.gyCenterPitchTrim = Integer.parseInt(String.valueOf(hm.get("H_pitch_center_trim")));
+            Horizon.gyCenterInvertedTrim = Integer.parseInt(String.valueOf(hm.get("H_inverted_center_trim")));
 
-            Horizon.gyRightInvertedTrim = Integer.valueOf(String.valueOf(hm.get("H_inverted_right_trim")));
-            Horizon.gyLeftInvertedTrim = Integer.valueOf(String.valueOf(hm.get("H_inverted_left_trim")));
-            Horizon.gyUpInvertedTrim = Integer.valueOf(String.valueOf(hm.get("H_inverted_up_trim")));
-            Horizon.gyDownInvertedTrim = Integer.valueOf(String.valueOf(hm.get("H_inverted_down_trim")));
+            Horizon.gyRightInvertedTrim = Integer.parseInt(String.valueOf(hm.get("H_inverted_right_trim")));
+            Horizon.gyLeftInvertedTrim = Integer.parseInt(String.valueOf(hm.get("H_inverted_left_trim")));
+            Horizon.gyUpInvertedTrim = Integer.parseInt(String.valueOf(hm.get("H_inverted_up_trim")));
+            Horizon.gyDownInvertedTrim = Integer.parseInt(String.valueOf(hm.get("H_inverted_down_trim")));
 
-            Horizon.gyRightTrim = Integer.valueOf(String.valueOf(hm.get("H_right_trim")));
-            Horizon.gyLeftTrim = Integer.valueOf(String.valueOf(hm.get("H_left_trim")));
-            Horizon.gyUpTrim = Integer.valueOf(String.valueOf(hm.get("H_up_trim")));
-            Horizon.gyDownTrim = Integer.valueOf(String.valueOf(hm.get("H_down_trim")));
+            Horizon.gyRightTrim = Integer.parseInt(String.valueOf(hm.get("H_right_trim")));
+            Horizon.gyLeftTrim = Integer.parseInt(String.valueOf(hm.get("H_left_trim")));
+            Horizon.gyUpTrim = Integer.parseInt(String.valueOf(hm.get("H_up_trim")));
+            Horizon.gyDownTrim = Integer.parseInt(String.valueOf(hm.get("H_down_trim")));
 
-            BMP280.altitudeTrim = Integer.valueOf(String.valueOf(hm.get("altitude_trim")));
+            BMP280.altitudeTrim = Integer.parseInt(String.valueOf(hm.get("altitude_trim")));
 
         } catch (Exception e) {
             throw new RuntimeException(e);

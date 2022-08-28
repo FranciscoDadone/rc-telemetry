@@ -1,10 +1,7 @@
 package com.franciscodadone.gui;
 
 import com.fazecast.jSerialComm.SerialPort;
-import com.franciscodadone.controller.ArduinoHandler;
-import com.franciscodadone.model.Accelerometer;
-import com.franciscodadone.model.BMP280;
-import com.franciscodadone.utils.Global;
+import com.franciscodadone.controller.MainFrameController;
 import com.franciscodadone.utils.Util;
 import com.github.kkieffer.jcirculargauges.JArtificialHorizonGauge;
 import com.github.kkieffer.jcirculargauges.JCompass;
@@ -19,10 +16,7 @@ import java.util.Arrays;
 
 public class MainFrame extends JFrame {
     private JPanel mainPanel;
-    private JPanel graphsPanel;
     private JPanel horizonPanel;
-    private JPanel subPanelIzq;
-    private JPanel subPanelDer;
     private JPanel altimeterPanel;
     private JPanel gPanel;
     private JPanel compassPanel;
@@ -31,22 +25,22 @@ public class MainFrame extends JFrame {
     private JPanel accelerometerGraphPanel;
     private JPanel temperaturePanel;
     private JButton calibrateButton;
-    private JComboBox comPortComboBox;
+    private JComboBox<Object> comPortComboBox;
     private JButton connectButton;
     private JPanel pressurePanel;
     private JButton resetGraphsButton;
     private JLabel maxGLabel;
     private JLabel maxAltitudeLabel;
     private JLabel flightTimeLabel;
-    public static JArtificialHorizonGauge ah;
-    public static JCompass compass;
-    public static JSpeedometer altimeter;
-    public static JSpeedometer gForce;
-    public static JEmptyGauge temperature;
-    public static JEmptyGauge pressure;
-    private XYSeries temperatureSeries;
-    private XYSeries altitudeSeries;
-    private XYSeries accelerometerMaxSeries;
+    private final JArtificialHorizonGauge ah;
+    private final JCompass compass;
+    private final JSpeedometer altimeter;
+    private final JSpeedometer gForce;
+    private final JEmptyGauge temperature;
+    private final JEmptyGauge pressure;
+    private final XYSeries temperatureSeries;
+    private final XYSeries altitudeSeries;
+    private final XYSeries accelerometerMaxSeries;
 
     public MainFrame() {
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -57,9 +51,7 @@ public class MainFrame extends JFrame {
         this.setContentPane(mainPanel);
 
         Object[] ports = Arrays.stream(SerialPort.getCommPorts()).toArray();
-        for (int i = 0; i < ports.length; i++) {
-            comPortComboBox.addItem(ports[i]);
-        }
+        for (Object port : ports) comPortComboBox.addItem(port);
 
         ah = new JArtificialHorizonGauge(1.5);
         ah.setColors(Color.WHITE, new Color(0, 0, 0), new Color(124, 69, 57), new Color(75, 113, 199));
@@ -89,21 +81,6 @@ public class MainFrame extends JFrame {
         gForce.setColors(Color.RED, new Color(0,0,0), new Color(16, 16, 16));
         gPanel.add(gForce, BorderLayout.CENTER);
         this.pack();
-
-
-        // --------- BUTTONS --------- //
-        calibrateButton.addActionListener(e -> {
-            new CalibrationFrame();
-        });
-
-        resetGraphsButton.addActionListener(e -> {
-            resetGraphs();
-        });
-
-        connectButton.addActionListener((e) -> {
-            connectArduino();
-        });
-        // --------- END BUTTONS --------- //
 
 
         // Temperature chart
@@ -140,67 +117,54 @@ public class MainFrame extends JFrame {
         accelerometerGraphPanel.validate();
         // END Accelerometer
 
-        new Thread(() -> {
-            int i = -1;
-            int i2 = -1;
-            while (true) {
-                if (Global.appStarted) {
-                    i++;
-                    i2++;
-                    if (i != 0) {
-                        temperatureSeries.add(i, BMP280.temperature);
-                        altitudeSeries.add(i, (int) BMP280.altitude);
-                        accelerometerMaxSeries.add(i, Accelerometer.maxZ);
-
-                        if (Accelerometer.maxGForceRegistered < Accelerometer.maxZ) Accelerometer.maxGForceRegistered = Accelerometer.maxZ;
-                        
-                        if (i2 == 60) {
-                            altitudeSeries.remove(0);
-                            temperatureSeries.remove(0);
-                            accelerometerMaxSeries.remove(0);
-                            i2 = 59;
-                        }
-                        Accelerometer.maxZ = 0;
-                    }
-                }
-                try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-        }).start();
-
-
-        new Thread(() -> {
-            while(true) {
-                if (Global.appStarted) {
-                    Util.updateHorizon();
-                    Util.updateAltimeter();
-                    Util.updateGForce();
-                    Util.updateTemperature();
-                    Util.updatePressure();
-                }
-                try {
-                    Thread.sleep(100);
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-        }).start();
+        new MainFrameController(this);
     }
 
-    private void resetGraphs() {
-        temperatureSeries.clear();
-        altitudeSeries.clear();
-        accelerometerMaxSeries.clear();
+    public JButton getCalibrateButton() {
+        return calibrateButton;
     }
 
-    private void connectArduino() {
-        ArduinoHandler.disconnect();
-        boolean started = ArduinoHandler.connect((SerialPort)comPortComboBox.getSelectedItem());
-        if (!started) return;
-        ArduinoHandler.startReading();
-        Global.appStarted = true;
+    public JButton getConnectButton() {
+        return connectButton;
+    }
+
+    public JButton getResetGraphsButton() {
+        return resetGraphsButton;
+    }
+
+    public JArtificialHorizonGauge getAh() {
+        return ah;
+    }
+
+    public JSpeedometer getAltimeter() {
+        return altimeter;
+    }
+
+    public JSpeedometer getGForce() {
+        return gForce;
+    }
+
+    public JEmptyGauge getTemperature() {
+        return temperature;
+    }
+
+    public JEmptyGauge getPressure() {
+        return pressure;
+    }
+
+    public XYSeries getTemperatureSeries() {
+        return temperatureSeries;
+    }
+
+    public XYSeries getAltitudeSeries() {
+        return altitudeSeries;
+    }
+
+    public XYSeries getAccelerometerMaxSeries() {
+        return accelerometerMaxSeries;
+    }
+
+    public JComboBox<Object> getComPortComboBox() {
+        return comPortComboBox;
     }
 }
