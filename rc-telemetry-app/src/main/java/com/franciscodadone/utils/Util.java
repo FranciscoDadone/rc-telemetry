@@ -1,5 +1,6 @@
 package com.franciscodadone.utils;
 
+import com.franciscodadone.Main;
 import com.franciscodadone.gui.MainFrame;
 import com.franciscodadone.model.Accelerometer;
 import com.franciscodadone.model.BMP280;

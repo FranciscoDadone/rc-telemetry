@@ -26,11 +26,6 @@ public class MainFrame extends JFrame {
     private JPanel altimeterPanel;
     private JPanel gPanel;
     private JPanel compassPanel;
-    private JButton setGyroCENTERButton;
-    private JButton setGyroRIGHTButton;
-    private JButton setGyroLEFTButton;
-    private JButton setGyroUPButton;
-    private JButton setGyroDOWNButton;
     private JPanel temperatureGraphPanel;
     private JPanel pressureGraphPanel;
     private JPanel accelerometerGraphPanel;
@@ -39,12 +34,19 @@ public class MainFrame extends JFrame {
     private JComboBox comPortComboBox;
     private JButton connectButton;
     private JPanel pressurePanel;
+    private JButton resetGraphsButton;
+    private JLabel maxGLabel;
+    private JLabel maxAltitudeLabel;
+    private JLabel flightTimeLabel;
     public static JArtificialHorizonGauge ah;
     public static JCompass compass;
     public static JSpeedometer altimeter;
     public static JSpeedometer gForce;
     public static JEmptyGauge temperature;
     public static JEmptyGauge pressure;
+    private XYSeries temperatureSeries;
+    private XYSeries altitudeSeries;
+    private XYSeries accelerometerMaxSeries;
 
     public MainFrame() {
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -59,19 +61,10 @@ public class MainFrame extends JFrame {
             comPortComboBox.addItem(ports[i]);
         }
 
-        connectButton.addActionListener((e) -> {
-            ArduinoHandler.disconnect();
-            boolean started = ArduinoHandler.connect((SerialPort)comPortComboBox.getSelectedItem());
-            if (!started) return;
-            ArduinoHandler.startReading();
-            Global.appStarted = true;
-        });
-
         ah = new JArtificialHorizonGauge(1.5);
         ah.setColors(Color.WHITE, new Color(0, 0, 0), new Color(124, 69, 57), new Color(75, 113, 199));
         horizonPanel.add(ah, BorderLayout.CENTER);
         ah.setAttitude(1, 1);
-
 
         temperature = new JEmptyGauge(1, "ºC", 9.0F);
         temperature.setColors(Color.RED, new Color(0,0,0), new Color(16, 16, 16));
@@ -97,13 +90,24 @@ public class MainFrame extends JFrame {
         gPanel.add(gForce, BorderLayout.CENTER);
         this.pack();
 
+
+        // --------- BUTTONS --------- //
         calibrateButton.addActionListener(e -> {
             new CalibrationFrame();
         });
 
+        resetGraphsButton.addActionListener(e -> {
+            resetGraphs();
+        });
+
+        connectButton.addActionListener((e) -> {
+            connectArduino();
+        });
+        // --------- END BUTTONS --------- //
+
 
         // Temperature chart
-        XYSeries temperatureSeries = new XYSeries("t");
+        temperatureSeries = new XYSeries("t");
         XYSeriesCollection temperatureDataset = new XYSeriesCollection();
         temperatureDataset.addSeries(temperatureSeries);
         ChartPanel temperatureChartPanel = new ChartPanel(Util.createChart(temperatureDataset, "Temperature", "Time", "ºC"));
@@ -114,7 +118,7 @@ public class MainFrame extends JFrame {
         temperatureGraphPanel.validate();
         // END Temperature chart
         // Altitude chart
-        XYSeries altitudeSeries = new XYSeries("a");
+        altitudeSeries = new XYSeries("a");
         XYSeriesCollection altitudeDataset = new XYSeriesCollection();
         altitudeDataset.addSeries(altitudeSeries);
         ChartPanel pressureChartPanel = new ChartPanel(Util.createChart(altitudeDataset, "Altitude", "Time", "Meters"));
@@ -125,7 +129,7 @@ public class MainFrame extends JFrame {
         pressureGraphPanel.validate();
         // END Pressure chart
         // Accelerometer
-        XYSeries accelerometerMaxSeries = new XYSeries("accMax");
+        accelerometerMaxSeries = new XYSeries("accMax");
         XYSeriesCollection accelerometerDataset = new XYSeriesCollection();
         accelerometerDataset.addSeries(accelerometerMaxSeries);
         ChartPanel accelerometerChartPanel = new ChartPanel(Util.createChart(accelerometerDataset, "Accelerometer", "Time", "Gs"));
@@ -148,6 +152,8 @@ public class MainFrame extends JFrame {
                         altitudeSeries.add(i, (int) BMP280.altitude);
                         accelerometerMaxSeries.add(i, Accelerometer.maxZ);
 
+                        if (Accelerometer.maxGForceRegistered < Accelerometer.maxZ) Accelerometer.maxGForceRegistered = Accelerometer.maxZ;
+                        
                         if (i2 == 60) {
                             altitudeSeries.remove(0);
                             temperatureSeries.remove(0);
@@ -182,5 +188,19 @@ public class MainFrame extends JFrame {
                 }
             }
         }).start();
+    }
+
+    private void resetGraphs() {
+        temperatureSeries.clear();
+        altitudeSeries.clear();
+        accelerometerMaxSeries.clear();
+    }
+
+    private void connectArduino() {
+        ArduinoHandler.disconnect();
+        boolean started = ArduinoHandler.connect((SerialPort)comPortComboBox.getSelectedItem());
+        if (!started) return;
+        ArduinoHandler.startReading();
+        Global.appStarted = true;
     }
 }
