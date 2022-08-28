@@ -302,6 +302,7 @@
               <background color="-24064"/>
               <borderPainted value="true"/>
               <focusPainted value="false"/>
+              <font size="16"/>
               <hideActionText value="true"/>
               <opaque value="true"/>
               <requestFocusEnabled value="false"/>
@@ -311,7 +312,7 @@
               <verifyInputWhenFocusTarget value="false"/>
             </properties>
           </component>
-          <grid id="62104" layout-manager="GridLayoutManager" row-count="1" column-count="2" same-size-horizontally="false" same-size-vertically="false" hgap="0" vgap="0">
+          <grid id="62104" layout-manager="GridLayoutManager" row-count="1" column-count="3" same-size-horizontally="false" same-size-vertically="false" hgap="0" vgap="0">
             <margin top="0" left="0" bottom="0" right="0"/>
             <constraints border-constraint="West"/>
             <properties>
@@ -321,23 +322,38 @@
             <children>
               <component id="7800" class="javax.swing.JComboBox" binding="comPortComboBox">
                 <constraints>
-                  <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
+                  <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="1" use-parent-layout="false"/>
                 </constraints>
                 <properties>
                   <background color="-1"/>
+                  <font size="18"/>
                   <foreground color="-16185079"/>
+                  <name value=""/>
+                  <toolTipText value=""/>
                 </properties>
               </component>
               <component id="f5ac" class="javax.swing.JButton" binding="connectButton" default-binding="true">
                 <constraints>
-                  <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                  <grid row="0" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
                 </constraints>
                 <properties>
                   <background color="-1"/>
                   <contentAreaFilled value="true"/>
                   <focusPainted value="false"/>
+                  <font size="16"/>
                   <foreground color="-16185079"/>
                   <text value="Connect"/>
+                </properties>
+              </component>
+              <component id="3070d" class="javax.swing.JLabel">
+                <constraints>
+                  <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="2" use-parent-layout="false"/>
+                </constraints>
+                <properties>
+                  <alignmentY value="1.0"/>
+                  <font size="16"/>
+                  <foreground color="-1246721"/>
+                  <text value="Select COM Port"/>
                 </properties>
               </component>
             </children>

@@ -10,7 +10,6 @@ import com.franciscodadone.utils.Global;
 
 import javax.swing.*;
 import java.time.LocalTime;
-import java.util.Arrays;
 
 public class MainFrameController {
     private final MainFrame view;
