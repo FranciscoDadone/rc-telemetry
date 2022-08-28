@@ -8,6 +8,10 @@ import com.franciscodadone.model.BMP280;
 import com.franciscodadone.model.Horizon;
 import com.franciscodadone.utils.Global;
 
+import javax.swing.*;
+import java.time.LocalTime;
+import java.util.Arrays;
+
 public class MainFrameController {
     private final MainFrame view;
 
@@ -22,6 +26,9 @@ public class MainFrameController {
         view.getResetGraphsButton().addActionListener(e -> resetGraphs());
         view.getConnectButton().addActionListener((e) -> connectArduino());
 
+        Object[] ports = ArduinoHandler.getPorts();
+        for (Object port : ports) view.getComPortComboBox().addItem(port);
+
         new Thread(() -> {
             int i = -1;
             int i2 = -1;
@@ -35,6 +42,12 @@ public class MainFrameController {
                         view.getAccelerometerMaxSeries().add(i, Accelerometer.maxZ);
 
                         if (Accelerometer.maxGForceRegistered < Accelerometer.maxZ) Accelerometer.maxGForceRegistered = Accelerometer.maxZ;
+                        view.getMaxGLabel().setText("Max Gs: " + Accelerometer.maxGForceRegistered + "G");
+
+                        if (BMP280.maxAltitudeRegistered < BMP280.altitude) BMP280.maxAltitudeRegistered = BMP280.altitude;
+                        view.getMaxAltitudeLabel().setText("Max Altitude: " + BMP280.maxAltitudeRegistered + "m");
+
+                        view.getFlightTimeLabel().setText("Flight time: " + LocalTime.ofSecondOfDay(Global.flightTime));
 
                         if (i2 == 60) {
                             view.getAltitudeSeries().remove(0);
@@ -76,10 +89,17 @@ public class MainFrameController {
         view.getTemperatureSeries().clear();
         view.getAltitudeSeries().clear();
         view.getAccelerometerMaxSeries().clear();
+
+        Accelerometer.maxGForceRegistered = 0;
+        BMP280.maxAltitudeRegistered = 0;
     }
 
     private void connectArduino() {
         ArduinoHandler.disconnect();
+        if (view.getComPortComboBox().getSelectedItem() == null) {
+            JOptionPane.showMessageDialog(null, "No COM port selected!","Error",  JOptionPane.ERROR_MESSAGE);
+            return;
+        }
         boolean started = ArduinoHandler.connect((SerialPort)view.getComPortComboBox().getSelectedItem());
         if (!started) return;
         ArduinoHandler.startReading();
@@ -109,7 +129,7 @@ public class MainFrameController {
     }
 
     private void updateGForce() {
-        view.getGForce().setSpeed(Accelerometer.maxZ / 1000);
+        view.getGForce().setSpeed((Accelerometer.maxZ / 1000) + 1);
     }
 
     private void updateTemperature() {

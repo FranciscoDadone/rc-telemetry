@@ -86,7 +86,7 @@
                         <properties>
                           <font name="Fira Code Retina" size="28" style="1"/>
                           <foreground color="-1246721"/>
-                          <text value="Max Gs: 10G"/>
+                          <text value="Max Gs: 0G"/>
                         </properties>
                       </component>
                       <component id="20bc0" class="javax.swing.JLabel" binding="maxAltitudeLabel">
@@ -96,7 +96,7 @@
                         <properties>
                           <font name="Fira Code Retina" size="28" style="1"/>
                           <foreground color="-1246721"/>
-                          <text value="Max Altitude: 1000"/>
+                          <text value="Max Altitude: 0m"/>
                         </properties>
                       </component>
                     </children>

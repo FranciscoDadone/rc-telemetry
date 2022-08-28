@@ -81,10 +81,11 @@ void setup() {
 }
 
 // Counter
-long int cpt = 0;
+long int flight_time = 0;
 
 void interrupt() {
   intFlag = true;
+  flight_time += 1;
 }
 
 int16_t ax, ay, az, gy, gx, gz, mx, my, mz;
@@ -150,6 +151,10 @@ void sendData() {
   
   // Accelerometer
   Serial.print(gx);
+  Serial.print(" ");
+
+  // Flight time
+  Serial.print(flight_time);
   
   /*
   // Gyroscope

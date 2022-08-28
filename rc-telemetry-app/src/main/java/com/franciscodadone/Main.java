@@ -1,10 +1,8 @@
 package com.franciscodadone;
 
-import com.franciscodadone.controller.ArduinoHandler;
 import com.franciscodadone.controller.ConfigurationHandler;
 import com.franciscodadone.gui.MainFrame;
 import com.franciscodadone.utils.Global;
-
 import java.io.*;
 
 public class Main {

@@ -1,10 +1,5 @@
 package com.franciscodadone.utils;
 
-import com.franciscodadone.Main;
-import com.franciscodadone.gui.MainFrame;
-import com.franciscodadone.model.Accelerometer;
-import com.franciscodadone.model.BMP280;
-import com.franciscodadone.model.Horizon;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.PlotOrientation;

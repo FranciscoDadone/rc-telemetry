@@ -6,11 +6,16 @@ import com.franciscodadone.model.BMP280;
 import com.franciscodadone.model.Horizon;
 import com.franciscodadone.utils.Global;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
 public class ArduinoHandler {
 
-    public static SerialPort serialPort;
+    private static SerialPort serialPort;
+
+    public static Object[] getPorts() {
+        return Arrays.stream(SerialPort.getCommPorts()).toArray();
+    }
 
     public static boolean connect(SerialPort port) {
         serialPort = port;
@@ -46,7 +51,7 @@ public class ArduinoHandler {
                         byte[] readBuffer = new byte[100];
                         serialPort.readBytes(readBuffer, readBuffer.length);
 
-                        String S = new String(readBuffer, "UTF-8");
+                        String S = new String(readBuffer, StandardCharsets.UTF_8);
 
                         for (String s : S.lines().toList()) {
                             if (s.startsWith(";") && s.endsWith(";") && (s.length() >= 10)) {
@@ -54,30 +59,32 @@ public class ArduinoHandler {
                                 Object[] arr = Arrays.stream(s.split(" ")).toArray();
 
                                 // Horizon
-                                Horizon.x = Integer.valueOf((String) arr[0]);
-                                Horizon.y = Integer.valueOf((String) arr[1]);
-                                Horizon.z = Integer.valueOf((String) arr[2]);
+                                Horizon.x = Integer.parseInt((String) arr[0]);
+                                Horizon.y = Integer.parseInt((String) arr[1]);
+                                Horizon.z = Integer.parseInt((String) arr[2]);
 
                                 Horizon.x -= Horizon.gyCenterRollTrim;
                                 Horizon.y -= Horizon.gyCenterPitchTrim;
                                 Horizon.z -= Horizon.gyCenterInvertedTrim;
                                 // END Horizon
 
-                                // Accelerometer
-                                Accelerometer.z = Integer.valueOf((String) arr[6]);
-                                if (Math.abs(Accelerometer.z) > Accelerometer.maxZ) Accelerometer.maxZ = Math.abs(Accelerometer.z);
-                                // END Accelerometer
-
                                 // BMP280
-                                BMP280.altitude = Float.valueOf((String) arr[3]);
-                                BMP280.pressure = Float.valueOf((String) arr[4]);
-                                BMP280.temperature = Float.valueOf((String) arr[5]);
+                                BMP280.altitude = Float.parseFloat((String) arr[3]);
+                                BMP280.pressure = Float.parseFloat((String) arr[4]);
+                                BMP280.temperature = Float.parseFloat((String) arr[5]);
 
                                 BMP280.altitudeFromArduino = BMP280.altitude;
                                 BMP280.altitude -= BMP280.altitudeTrim;
 
                                 if (BMP280.altitude < 0) BMP280.altitude = 0;
                                 // END BMP280
+
+                                // Accelerometer
+                                Accelerometer.z = Integer.parseInt((String) arr[6]);
+                                if (Math.abs(Accelerometer.z) > Accelerometer.maxZ) Accelerometer.maxZ = Math.abs(Accelerometer.z);
+                                // END Accelerometer
+
+                                Global.flightTime = Integer.parseInt((String) arr[7]);
 
                                 break;
                             }

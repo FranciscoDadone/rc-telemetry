@@ -1,6 +1,5 @@
 package com.franciscodadone.gui;
 
-import com.fazecast.jSerialComm.SerialPort;
 import com.franciscodadone.controller.MainFrameController;
 import com.franciscodadone.utils.Util;
 import com.github.kkieffer.jcirculargauges.JArtificialHorizonGauge;
@@ -9,10 +8,8 @@ import com.github.kkieffer.jcirculargauges.JSpeedometer;
 import org.jfree.chart.ChartPanel;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
-
 import javax.swing.*;
 import java.awt.*;
-import java.util.Arrays;
 
 public class MainFrame extends JFrame {
     private JPanel mainPanel;
@@ -49,9 +46,6 @@ public class MainFrame extends JFrame {
         this.setMinimumSize(new Dimension(1100, 700));
         this.setTitle("RC Telemetry");
         this.setContentPane(mainPanel);
-
-        Object[] ports = Arrays.stream(SerialPort.getCommPorts()).toArray();
-        for (Object port : ports) comPortComboBox.addItem(port);
 
         ah = new JArtificialHorizonGauge(1.5);
         ah.setColors(Color.WHITE, new Color(0, 0, 0), new Color(124, 69, 57), new Color(75, 113, 199));
@@ -166,5 +160,21 @@ public class MainFrame extends JFrame {
 
     public JComboBox<Object> getComPortComboBox() {
         return comPortComboBox;
+    }
+
+    public JLabel getMaxGLabel() {
+        return maxGLabel;
+    }
+
+    public JLabel getMaxAltitudeLabel() {
+        return maxAltitudeLabel;
+    }
+
+    public JLabel getFlightTimeLabel() {
+        return flightTimeLabel;
+    }
+
+    public JCompass getCompass() {
+        return compass;
     }
 }
