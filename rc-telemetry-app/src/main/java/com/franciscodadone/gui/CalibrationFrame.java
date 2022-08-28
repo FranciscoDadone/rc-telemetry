@@ -20,6 +20,8 @@ public class CalibrationFrame extends JFrame {
         this.setVisible(true);
         this.setTitle("RC Telemetry - Calibration");
         this.setContentPane(mainPanel);
+        this.setResizable(false);
+        this.setLocationRelativeTo(null);
 
         new CalibrationFrameController(this);
     }

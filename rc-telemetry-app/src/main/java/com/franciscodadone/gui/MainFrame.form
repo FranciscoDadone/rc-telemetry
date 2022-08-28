@@ -240,6 +240,7 @@
               <alignmentX value="0.0"/>
               <alignmentY value="0.0"/>
               <background color="-14408667"/>
+              <minimumSize width="1754" height="200"/>
             </properties>
             <border type="line" title="Data">
               <title-color color="-1246721"/>
