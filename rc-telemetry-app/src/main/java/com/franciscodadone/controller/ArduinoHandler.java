@@ -1,10 +1,12 @@
 package com.franciscodadone.controller;
 
 import com.fazecast.jSerialComm.SerialPort;
+import com.franciscodadone.gui.CompassCalibrationFrame;
 import com.franciscodadone.model.Accelerometer;
 import com.franciscodadone.model.BMP280;
 import com.franciscodadone.model.Compass;
 import com.franciscodadone.model.Horizon;
+import com.franciscodadone.utils.AppStatus;
 import com.franciscodadone.utils.Global;
 
 import java.nio.charset.StandardCharsets;
@@ -13,6 +15,7 @@ import java.util.Arrays;
 public class ArduinoHandler {
 
     private static SerialPort serialPort;
+    private static CompassCalibrationFrame calibrationFrame;
 
     public static Object[] getPorts() {
         return Arrays.stream(SerialPort.getCommPorts()).toArray();
@@ -40,7 +43,7 @@ public class ArduinoHandler {
 
     public static void disconnect() {
         if (serialPort == null) return;
-        Global.appStarted = false;
+        Global.appStatus = AppStatus.PRE_START;
         serialPort.closePort();
     }
 
@@ -48,14 +51,25 @@ public class ArduinoHandler {
         new Thread(() -> {
             try {
                 while (true) {
-                    if (Global.appStarted) {
+                    if (Global.appStatus.equals(AppStatus.STARTED) || Global.appStatus.equals(AppStatus.CALIBRATING)) {
                         byte[] readBuffer = new byte[100];
                         serialPort.readBytes(readBuffer, readBuffer.length);
 
                         String S = new String(readBuffer, StandardCharsets.UTF_8);
 
+                        if (Global.appStatus.equals(AppStatus.CALIBRATING) && S.lines().toList().get(0).startsWith(";")) {
+                            calibrationFrame.setVisible(false);
+
+                            Global.appStatus = AppStatus.STARTED;
+                        }
+
                         for (String s : S.lines().toList()) {
-                            if (s.startsWith(";") && s.endsWith(";") && (s.length() >= 10)) {
+                            if (s.contains("calibration")) {
+                                calibrationFrame = new CompassCalibrationFrame();
+
+                                Global.appStatus = AppStatus.CALIBRATING;
+                                break;
+                            } else if (s.startsWith(";") && s.endsWith(";") && (s.length() >= 10)) {
                                 s = s.replace(";", "");
                                 Object[] arr = Arrays.stream(s.split(" ")).toArray();
 

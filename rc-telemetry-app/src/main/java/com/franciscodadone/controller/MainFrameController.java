@@ -7,6 +7,7 @@ import com.franciscodadone.model.Accelerometer;
 import com.franciscodadone.model.BMP280;
 import com.franciscodadone.model.Compass;
 import com.franciscodadone.model.Horizon;
+import com.franciscodadone.utils.AppStatus;
 import com.franciscodadone.utils.Global;
 
 import javax.swing.*;
@@ -36,7 +37,7 @@ public class MainFrameController {
             int i = -1;
             int i2 = -1;
             while (true) {
-                if (Global.appStarted) {
+                if (Global.appStatus.equals(AppStatus.STARTED)) {
                     i++;
                     i2++;
                     if (i != 0) {
@@ -72,7 +73,7 @@ public class MainFrameController {
 
         new Thread(() -> {
             while(true) {
-                if (Global.appStarted) {
+                if (Global.appStatus.equals(AppStatus.STARTED)) {
                     updateHorizon();
                     updateAltimeter();
                     updateGForce();
@@ -108,7 +109,7 @@ public class MainFrameController {
         boolean started = ArduinoHandler.connect((SerialPort)view.getComPortComboBox().getSelectedItem());
         if (!started) return;
         ArduinoHandler.startReading();
-        Global.appStarted = true;
+        Global.appStatus = AppStatus.STARTED;
     }
 
     private void updateHorizon() {

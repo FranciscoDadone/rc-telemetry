@@ -29,7 +29,7 @@ void setup() {
   mySensor.beginMag();
 
   // Calibrate magnetometer
-  Serial.println("calibration " + CALIB_SEC);
+  Serial.println("calibration");
   setMagMinMaxAndSetOffset(&mySensor, CALIB_SEC);
   
   Timer1.initialize(10000);
@@ -53,7 +53,7 @@ void update_flight_time() {
   times.flight_time = 100;
 }
 
-void calculate_data() {
+void calculate_and_send_data() {
   while (!intFlag);
   intFlag = false;
   
