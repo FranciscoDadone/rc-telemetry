@@ -134,15 +134,24 @@ void calculate_and_send_data() {
   mx =- (Mag[3]<<8 | Mag[2]);
   my =- (Mag[1]<<8 | Mag[0]);
   mz =- (Mag[5]<<8 | Mag[4]);
-/*
-  Serial.print(gy);
+
+  /*
+  Serial.print(my);
   Serial.print("\t");
-  Serial.print(gx);
+  Serial.print(mx);
   Serial.print("\t");
-  Serial.print(gz);
+  Serial.print(mz);
   Serial.println("");
-*/
-  sendData();
+  */
+  int heading = 0;
+  if (my > 0) { heading = 90 - atan(mx/my)*(180/M_PI); }
+  else if (my < 0) { heading = 270 - atan(mx/my)*(180/M_PI); }
+  else if (mx < 0) { heading = 180; }
+  else if (mx > 0) { heading = 0; }
+
+  Serial.println(heading);
+  
+  //sendData();
 }
 
 void sendData() {
@@ -169,6 +178,13 @@ void sendData() {
 
   // Flight time
   Serial.print(flight_time);
+  Serial.print(" ");
+
+  // Compass
+  //Serial.print(my);
+
+  // 0 north
+  // -180 
   
   /*
   // Gyroscope

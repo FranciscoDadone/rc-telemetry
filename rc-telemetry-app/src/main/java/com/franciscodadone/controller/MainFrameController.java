@@ -5,6 +5,7 @@ import com.franciscodadone.gui.CalibrationFrame;
 import com.franciscodadone.gui.MainFrame;
 import com.franciscodadone.model.Accelerometer;
 import com.franciscodadone.model.BMP280;
+import com.franciscodadone.model.Compass;
 import com.franciscodadone.model.Horizon;
 import com.franciscodadone.utils.Global;
 
@@ -57,7 +58,7 @@ public class MainFrameController {
                             view.getAccelerometerMaxSeries().remove(0);
                             i2 = 59;
                         }
-                        Accelerometer.maxZ = 0;
+                        Accelerometer.maxZ = 1;
                     }
                 }
                 try {
@@ -77,6 +78,7 @@ public class MainFrameController {
                     updateGForce();
                     updateTemperature();
                     updatePressure();
+                    updateCompass();
                 }
                 try {
                     Thread.sleep(100);
@@ -91,6 +93,7 @@ public class MainFrameController {
         view.getTemperatureSeries().clear();
         view.getAltitudeSeries().clear();
         view.getAccelerometerMaxSeries().clear();
+        view.getPressureSeries().clear();
 
         Accelerometer.maxGForceRegistered = 0;
         BMP280.maxAltitudeRegistered = 0;
@@ -111,9 +114,6 @@ public class MainFrameController {
     private void updateHorizon() {
         int tempGyX = Horizon.x;
         int tempGyY = Horizon.y;
-        int tempGyZ = Horizon.z;
-
-        if (Horizon.gyLeftInvertedTrim != 0) tempGyZ = (Math.abs(Horizon.z) * -90) / Horizon.gyLeftInvertedTrim;
 
         if (Horizon.gyLeftTrim != 0 && Horizon.x < 0) tempGyX = (Math.abs(Horizon.x) * 90) / Horizon.gyLeftTrim;
         if (Horizon.gyRightTrim != 0 && Horizon.x >= 0) tempGyX = (Math.abs(Horizon.x) * 90) / Horizon.gyRightTrim;
@@ -121,7 +121,7 @@ public class MainFrameController {
         if (Horizon.gyDownTrim != 0 && Horizon.y >= 0) tempGyY = (Math.abs(Horizon.y) * -55) / Horizon.gyDownTrim;
         if (Horizon.gyUpTrim != 0 && Horizon.y < 0) tempGyY = (Math.abs(Horizon.y) * -55) / Horizon.gyUpTrim;
 
-        boolean isInverted = tempGyZ > 90;
+        boolean isInverted = Horizon.z >= 0;
 
         view.getAh().setAttitude((isInverted) ? -tempGyX - 180 : tempGyX, (tempGyY != 0) ? tempGyY : 1);
     }
@@ -140,5 +140,9 @@ public class MainFrameController {
 
     private void updatePressure() {
         view.getPressure().setSpeed(BMP280.pressure);
+    }
+
+    private void updateCompass() {
+        view.getCompass().setCourse(Compass.heading);
     }
 }

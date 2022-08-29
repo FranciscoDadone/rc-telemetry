@@ -3,6 +3,7 @@ package com.franciscodadone.controller;
 import com.fazecast.jSerialComm.SerialPort;
 import com.franciscodadone.model.Accelerometer;
 import com.franciscodadone.model.BMP280;
+import com.franciscodadone.model.Compass;
 import com.franciscodadone.model.Horizon;
 import com.franciscodadone.utils.Global;
 
@@ -80,12 +81,17 @@ public class ArduinoHandler {
                                 // END BMP280
 
                                 // Accelerometer
-                                Accelerometer.z = Integer.parseInt((String) arr[6]);
+                                Accelerometer.z = Float.parseFloat((String) arr[6]);
                                 if (Math.abs(Accelerometer.z) > Accelerometer.maxZ) Accelerometer.maxZ = (Math.abs(Accelerometer.z) / 1000) + 1;
                                 if (Accelerometer.maxGForceRegistered < Accelerometer.maxZ) Accelerometer.maxGForceRegistered = Accelerometer.maxZ;
                                 // END Accelerometer
 
                                 Global.flightTime = Integer.parseInt((String) arr[7]);
+
+                                // Compass
+                                double tmpHeading = Double.parseDouble((String) arr[8]);
+                                Compass.heading = (tmpHeading < 0 ) ? tmpHeading + 360 : tmpHeading ;
+                                // END Compass
 
                                 break;
                             }
