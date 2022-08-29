@@ -59,7 +59,6 @@ public class ArduinoHandler {
 
                         if (Global.appStatus.equals(AppStatus.CALIBRATING) && S.lines().toList().get(0).startsWith(";")) {
                             calibrationFrame.setVisible(false);
-
                             Global.appStatus = AppStatus.STARTED;
                         }
 
@@ -96,7 +95,7 @@ public class ArduinoHandler {
 
                                 // Accelerometer
                                 Accelerometer.z = Float.parseFloat((String) arr[6]);
-                                if (Math.abs(Accelerometer.z) > Accelerometer.maxZ) Accelerometer.maxZ = (Math.abs(Accelerometer.z) / 1000) + 1;
+                                if (Math.abs(Accelerometer.z) > Accelerometer.maxZ) Accelerometer.maxZ = (Math.abs(Accelerometer.z));
                                 if (Accelerometer.maxGForceRegistered < Accelerometer.maxZ) Accelerometer.maxGForceRegistered = Accelerometer.maxZ;
                                 // END Accelerometer
 

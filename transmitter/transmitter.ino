@@ -93,7 +93,8 @@ void sendData() {
   Serial.print(" ");
   
   // Accelerometer
-  Serial.print(gX);
+  //Serial.print(gX);
+  Serial.print(aSqrt);
   Serial.print(" ");
 
   // Flight time
