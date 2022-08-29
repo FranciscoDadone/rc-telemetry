@@ -1,56 +1,22 @@
 #include <Wire.h>
 #include <TimerOne.h>
 #include "SparkFunBME280.h"
+#include <MPU9250_asukiaaa.h>
 
-#define    MPU9250_ADDRESS            0x68
-#define    MAG_ADDRESS                0x0C
+#define CALIB_SEC 10 // magnetometer calibration (20s preffered)
 
-#define    GYRO_FULL_SCALE_250_DPS    0x00  
-#define    GYRO_FULL_SCALE_500_DPS    0x08
-#define    GYRO_FULL_SCALE_1000_DPS   0x10
-#define    GYRO_FULL_SCALE_2000_DPS   0x18
-
-#define    ACC_FULL_SCALE_2_G        0x00  
-#define    ACC_FULL_SCALE_4_G        0x08
-#define    ACC_FULL_SCALE_8_G        0x10
-#define    ACC_FULL_SCALE_16_G       0x18
-
+MPU9250_asukiaaa mySensor;
 BME280 mySensorA;
 
-// This function read Nbytes bytes from I2C device at address Address. 
-// Put read bytes starting at register Register in the Data array. 
-void I2Cread(uint8_t Address, uint8_t Register, uint8_t Nbytes, uint8_t* Data) {
-  // Set register address
-  Wire.beginTransmission(Address);
-  Wire.write(Register);
-  Wire.endTransmission();
-  
-  // Read Nbytes
-  Wire.requestFrom(Address, Nbytes); 
-  uint8_t index=0;
-  while (Wire.available())
-    Data[index++]=Wire.read();
-}
+volatile bool intFlag = false;
+long int flight_time = 0;
+float aX, aY, aZ, aSqrt, gX, gY, gZ, mDirection, mX, mY, mZ;
 
+struct {
+  uint8_t flight_time;
+} times;
 
-// Write a byte (Data) in device (Address) at register (Register)
-void I2CwriteByte(uint8_t Address, uint8_t Register, uint8_t Data) {
-  // Set register address
-  Wire.beginTransmission(Address);
-  Wire.write(Register);
-  Wire.write(Data);
-  Wire.endTransmission();
-}
-
-
-
-// Initial time
-long int ti;
-volatile bool intFlag=false;
-
-// Initializations
 void setup() {
-  // Arduino initializations
   
   Wire.begin();
   Serial.begin(9600);
@@ -58,40 +24,23 @@ void setup() {
   mySensorA.setI2CAddress(0x76);
   if(mySensorA.beginI2C() == false) Serial.println("Sensor A connect failed");
 
-  // Set accelerometers low pass filter at 5Hz
-  I2CwriteByte(MPU9250_ADDRESS, 29, 0x06);
-  // Set gyroscope low pass filter at 5Hz
-  I2CwriteByte(MPU9250_ADDRESS, 26, 0x06);
- 
-  
-  // Configure gyroscope range
-  I2CwriteByte(MPU9250_ADDRESS, 27, GYRO_FULL_SCALE_1000_DPS);
-  // Configure accelerometers range
-  I2CwriteByte(MPU9250_ADDRESS, 28, ACC_FULL_SCALE_16_G);
-  // Set by pass mode for the magnetometers
-  I2CwriteByte(MPU9250_ADDRESS, 0x37, 0x02);
-  
-  // Request continuous magnetometer measurements in 16 bits
-  I2CwriteByte(MAG_ADDRESS,0x0A,0x16);
+  mySensor.beginAccel();
+  mySensor.beginGyro();
+  mySensor.beginMag();
+
+  // Calibrate magnetometer
+  Serial.println("calibration " + CALIB_SEC);
+  setMagMinMaxAndSetOffset(&mySensor, CALIB_SEC);
   
   Timer1.initialize(10000);
   Timer1.attachInterrupt(interrupt);
-  
-  ti = millis();
 }
-
-long int flight_time = 0;
-
-struct {
-  uint8_t flight_time;
-} times;
 
 void interrupt() {
   intFlag = true;
   if (times.flight_time) times.flight_time--;
 }
 
-int16_t ax, ay, az, gy, gx, gz, mx, my, mz;
 
 void loop() {
   update_flight_time();
@@ -104,65 +53,36 @@ void update_flight_time() {
   times.flight_time = 100;
 }
 
-void calculate_and_send_data() {
+void calculate_data() {
   while (!intFlag);
   intFlag = false;
- 
-  uint8_t Buf[14];
-  I2Cread(MPU9250_ADDRESS, 0x3B, 14, Buf);
   
-  // Accelerometer
-  ax =- (Buf[0]<<8 | Buf[1]);
-  ay =- (Buf[2]<<8 | Buf[3]);
-  az = Buf[4]<<8 | Buf[5];
+  mySensor.accelUpdate();
+  aX = mySensor.accelX();
+  aY = mySensor.accelY();
+  aZ = mySensor.accelZ();
+  aSqrt = mySensor.accelSqrt();
 
-  // Gyroscope
-  gx =- (Buf[8]<<8 | Buf[9]);
-  gy =- (Buf[10]<<8 | Buf[11]);
-  gz = Buf[12]<<8 | Buf[13];
-  
-  // Magnetometer
-  uint8_t ST1;
-  do {
-    I2Cread(MAG_ADDRESS,0x02,1,&ST1);
-  } while (!(ST1&0x01));
-  // Read data
-  uint8_t Mag[7];  
-  I2Cread(MAG_ADDRESS,0x03,7,Mag);
-  
-  // Magnetometer
-  mx =- (Mag[3]<<8 | Mag[2]);
-  my =- (Mag[1]<<8 | Mag[0]);
-  mz =- (Mag[5]<<8 | Mag[4]);
+  mySensor.gyroUpdate();
+  gX = mySensor.gyroX();
+  gY = mySensor.gyroY();
+  gZ = mySensor.gyroZ();
 
-  /*
-  Serial.print(my);
-  Serial.print("\t");
-  Serial.print(mx);
-  Serial.print("\t");
-  Serial.print(mz);
-  Serial.println("");
-  */
-  int heading = 0;
-  if (my > 0) { heading = 90 - atan(mx/my)*(180/M_PI); }
-  else if (my < 0) { heading = 270 - atan(mx/my)*(180/M_PI); }
-  else if (mx < 0) { heading = 180; }
-  else if (mx > 0) { heading = 0; }
+  mySensor.magUpdate();
+  mDirection = mySensor.magHorizDirection();
 
-  Serial.println(heading);
-  
-  //sendData();
+  sendData();
 }
 
 void sendData() {
-  // Gyro
   Serial.print(";");
-  Serial.print (ax,DEC); 
-  Serial.print (" ");
-  Serial.print (ay,DEC);
-  Serial.print (" ");
-  Serial.print (az,DEC);  
-  Serial.print (" ");
+  // Gyro
+  Serial.print(aX * 1000, 0);
+  Serial.print(" ");
+  Serial.print(aY * 1000, 0);
+  Serial.print(" ");
+  Serial.print(aZ * 1000, 0);
+  Serial.print(" ");
 
   // Altitude and Temperature
   Serial.print(mySensorA.readFloatAltitudeMeters(), 2);
@@ -173,36 +93,43 @@ void sendData() {
   Serial.print(" ");
   
   // Accelerometer
-  Serial.print(gx);
+  Serial.print(gX);
   Serial.print(" ");
 
   // Flight time
   Serial.print(flight_time);
   Serial.print(" ");
-
-  // Compass
-  //Serial.print(my);
-
-  // 0 north
-  // -180 
   
-  /*
-  // Gyroscope
-  Serial.print (gx,DEC); 
-  Serial.print (" ");
-  Serial.print (gy,DEC);
-  Serial.print (" ");
-  Serial.print (gz,DEC);  
-  */
-
-/*
   // Magnetometer
-  Serial.print (mx+200,DEC); 
-  Serial.print (" ");
-  Serial.print (my-70,DEC);
-  Serial.print (" ");
-  Serial.print (mz-700,DEC);  
-*/
+  Serial.print(mDirection);
 
   Serial.println(";");
+}
+
+void setMagMinMaxAndSetOffset(MPU9250_asukiaaa* sensor, int seconds) {
+  unsigned long calibStartAt = millis();
+  float magX, magXMin, magXMax, magY, magYMin, magYMax, magZ, magZMin, magZMax;
+
+  sensor->magUpdate();
+  magXMin = magXMax = sensor->magX();
+  magYMin = magYMax = sensor->magY();
+  magZMin = magZMax = sensor->magZ();
+
+  while(millis() - calibStartAt < (unsigned long) seconds * 1000) {
+    delay(100);
+    sensor->magUpdate();
+    magX = sensor->magX();
+    magY = sensor->magY();
+    magZ = sensor->magZ();
+    if (magX > magXMax) magXMax = magX;
+    if (magY > magYMax) magYMax = magY;
+    if (magZ > magZMax) magZMax = magZ;
+    if (magX < magXMin) magXMin = magX;
+    if (magY < magYMin) magYMin = magY;
+    if (magZ < magZMin) magZMin = magZ;
+  }
+
+  sensor->magXOffset = - (magXMax + magXMin) / 2;
+  sensor->magYOffset = - (magYMax + magYMin) / 2;
+  sensor->magZOffset = - (magZMax + magZMin) / 2;
 }
