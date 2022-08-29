@@ -33,7 +33,7 @@
               <requestFocusEnabled value="false"/>
               <rolloverEnabled value="true"/>
               <selected value="false"/>
-              <text value="Calibrate"/>
+              <text value="Calibrar"/>
               <verifyInputWhenFocusTarget value="false"/>
             </properties>
           </component>
@@ -67,7 +67,7 @@
                   <focusPainted value="false"/>
                   <font size="16"/>
                   <foreground color="-16185079"/>
-                  <text value="Connect"/>
+                  <text value="Conectar"/>
                 </properties>
               </component>
               <component id="3070d" class="javax.swing.JLabel">
@@ -78,7 +78,7 @@
                   <alignmentY value="1.0"/>
                   <font size="16"/>
                   <foreground color="-1246721"/>
-                  <text value="Select COM Port"/>
+                  <text value="Seleccionar puerto COM"/>
                 </properties>
               </component>
             </children>
@@ -271,7 +271,7 @@
                         <properties>
                           <background color="-14408667"/>
                         </properties>
-                        <border type="none" title="G Force">
+                        <border type="none" title="Fuerza G">
                           <title-color color="-1"/>
                         </border>
                         <children/>
@@ -283,7 +283,7 @@
                         <properties>
                           <background color="-14408667"/>
                         </properties>
-                        <border type="none" title="Temperature">
+                        <border type="none" title="Temperatura">
                           <title-color color="-1"/>
                         </border>
                         <children/>
@@ -296,7 +296,7 @@
                         <properties>
                           <background color="-14408667"/>
                         </properties>
-                        <border type="none" title="Realtime">
+                        <border type="none" title="Tiempo real">
                           <title-color color="-1"/>
                         </border>
                         <children>
@@ -328,7 +328,7 @@
                                 <properties>
                                   <font name="Fira Code Retina" size="18" style="1"/>
                                   <foreground color="-1246721"/>
-                                  <text value="Max Altitude: 1000m"/>
+                                  <text value="Max Altura: 0m"/>
                                 </properties>
                               </component>
                             </children>
@@ -351,7 +351,7 @@
                                   <alignmentY value="1.0"/>
                                   <font name="Fira Code Retina" size="18" style="1"/>
                                   <foreground color="-1246721"/>
-                                  <text value="Flight time:  00:00:00"/>
+                                  <text value="T. Vuelo:  00:00:00"/>
                                 </properties>
                               </component>
                             </children>
@@ -362,7 +362,7 @@
                             </constraints>
                             <properties>
                               <background color="-1246721"/>
-                              <text value="Reset graphs"/>
+                              <text value="Resetear gráficas"/>
                             </properties>
                           </component>
                         </children>
@@ -376,7 +376,7 @@
                         <properties>
                           <background color="-14408667"/>
                         </properties>
-                        <border type="none" title="Altitude">
+                        <border type="none" title="Altura">
                           <title-color color="-1"/>
                         </border>
                         <children/>
@@ -385,7 +385,7 @@
                   </grid>
                   <grid id="7c8fb" binding="altitudeSubPane" layout-manager="BorderLayout" hgap="0" vgap="0">
                     <constraints>
-                      <tabbedpane title="Altitude"/>
+                      <tabbedpane title="Altura"/>
                     </constraints>
                     <properties/>
                     <border type="none"/>
@@ -394,7 +394,7 @@
                   <grid id="7047e" layout-manager="GridLayoutManager" row-count="2" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
                     <margin top="0" left="0" bottom="0" right="0"/>
                     <constraints>
-                      <tabbedpane title="Altitude &amp; Pressure"/>
+                      <tabbedpane title="Altura y Presión"/>
                     </constraints>
                     <properties>
                       <background color="-14408667"/>
@@ -421,7 +421,7 @@
                   </grid>
                   <grid id="4e1e2" binding="temperatureSubPane" layout-manager="BorderLayout" hgap="0" vgap="0">
                     <constraints>
-                      <tabbedpane title="Temperature"/>
+                      <tabbedpane title="Temperatura"/>
                     </constraints>
                     <properties/>
                     <border type="none"/>
@@ -429,7 +429,7 @@
                   </grid>
                   <grid id="fe951" binding="gForceSubPane" layout-manager="BorderLayout" hgap="0" vgap="0">
                     <constraints>
-                      <tabbedpane title="G Force"/>
+                      <tabbedpane title="Fuerza G"/>
                     </constraints>
                     <properties/>
                     <border type="none"/>

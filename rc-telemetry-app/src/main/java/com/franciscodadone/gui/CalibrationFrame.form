@@ -22,7 +22,7 @@
             </constraints>
             <properties>
               <focusPainted value="false"/>
-              <text value="LEFT"/>
+              <text value="IZQUIERDA"/>
             </properties>
           </component>
           <component id="fd0f0" class="javax.swing.JButton" binding="setGyroCENTERButton">
@@ -31,7 +31,7 @@
             </constraints>
             <properties>
               <focusPainted value="false"/>
-              <text value="CENTER"/>
+              <text value="CENTRO"/>
             </properties>
           </component>
           <component id="365d1" class="javax.swing.JButton" binding="setGyroRIGHTButton">
@@ -40,7 +40,7 @@
             </constraints>
             <properties>
               <focusPainted value="false"/>
-              <text value="RIGHT"/>
+              <text value="DERECHA"/>
             </properties>
           </component>
           <component id="a6245" class="javax.swing.JButton" binding="setGyroUPButton">
@@ -49,7 +49,7 @@
             </constraints>
             <properties>
               <focusPainted value="false"/>
-              <text value="UP"/>
+              <text value="ARRIBA"/>
             </properties>
           </component>
           <component id="faef5" class="javax.swing.JButton" binding="setGyroDOWNButton">
@@ -58,7 +58,7 @@
             </constraints>
             <properties>
               <focusPainted value="false"/>
-              <text value="DOWN"/>
+              <text value="ABAJO"/>
             </properties>
           </component>
         </children>
@@ -78,7 +78,7 @@
             <properties>
               <borderPainted value="true"/>
               <focusPainted value="false"/>
-              <text value="Calibrate altitude"/>
+              <text value="Calibrar altura"/>
             </properties>
           </component>
         </children>

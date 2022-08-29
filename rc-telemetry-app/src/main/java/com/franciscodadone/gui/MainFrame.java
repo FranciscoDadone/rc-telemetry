@@ -73,7 +73,7 @@ public class MainFrame extends JFrame {
         compassPanel.add(compass);
         compassPanel.setPreferredSize(new Dimension(100,100));
 
-        altimeter = new JSpeedometer(100, "meters");
+        altimeter = new JSpeedometer(100, "metros");
         altimeter.setColors(Color.RED, new Color(0,0,0), new Color(16, 16, 16));
         altimeterPanel.add(altimeter, BorderLayout.CENTER);
 
@@ -84,11 +84,11 @@ public class MainFrame extends JFrame {
 
 
         // Temperature chart
-        temperatureSeries = new XYSeries("Temperature");
+        temperatureSeries = new XYSeries("Temperatura");
         XYSeriesCollection temperatureDataset = new XYSeriesCollection();
         temperatureDataset.addSeries(temperatureSeries);
-        ChartPanel temperatureChartPanel = new ChartPanel(Util.createChart(temperatureDataset, "Temperature", "Time", "ºC"));
-        ChartPanel temperatureChartPanel1 = new ChartPanel(Util.createChart(temperatureDataset, "Temperature", "Time", "ºC"));;
+        ChartPanel temperatureChartPanel = new ChartPanel(Util.createChart(temperatureDataset, "Temperatura", "Tiempo", "ºC"));
+        ChartPanel temperatureChartPanel1 = new ChartPanel(Util.createChart(temperatureDataset, "Temperatura", "Tiempo", "ºC"));;
         temperatureChartPanel.validate();
         temperatureChartPanel1.validate();
         temperatureChartPanel.setPreferredSize(temperatureGraphPanel.getPreferredSize());
@@ -99,12 +99,12 @@ public class MainFrame extends JFrame {
 
         // END Temperature chart
         // Altitude chart
-        altitudeSeries = new XYSeries("Altitude");
+        altitudeSeries = new XYSeries("Altura");
         XYSeriesCollection altitudeDataset = new XYSeriesCollection();
         altitudeDataset.addSeries(altitudeSeries);
-        ChartPanel altitudeChartPanel = new ChartPanel(Util.createChart(altitudeDataset, "Altitude", "Time", "Meters"));
-        ChartPanel altitudeChartPanel1 = new ChartPanel(Util.createChart(altitudeDataset, "Altitude", "Time", "Meters"));
-        ChartPanel altitudeChartPanel2 = new ChartPanel(Util.createChart(altitudeDataset, "Altitude", "Time", "Meters"));
+        ChartPanel altitudeChartPanel = new ChartPanel(Util.createChart(altitudeDataset, "Altura", "Tiempo", "Metros"));
+        ChartPanel altitudeChartPanel1 = new ChartPanel(Util.createChart(altitudeDataset, "Altura", "Tiempo", "Metros"));
+        ChartPanel altitudeChartPanel2 = new ChartPanel(Util.createChart(altitudeDataset, "Altura", "Tiempo", "Metros"));
         altitudeChartPanel.validate();
         altitudeChartPanel.setPreferredSize(altitudeGraphPanel.getPreferredSize());
         altitudeGraphPanel.add(altitudeChartPanel, BorderLayout.CENTER);
@@ -114,11 +114,11 @@ public class MainFrame extends JFrame {
         altitudeGraphPanel.validate();
         // END Pressure chart
         // Accelerometer chart
-        accelerometerMaxSeries = new XYSeries("Acceleration");
+        accelerometerMaxSeries = new XYSeries("Aceleración");
         XYSeriesCollection accelerometerDataset = new XYSeriesCollection();
         accelerometerDataset.addSeries(accelerometerMaxSeries);
-        ChartPanel accelerometerChartPanel = new ChartPanel(Util.createChart(accelerometerDataset, "Acceleration", "Time", "Gs"));
-        ChartPanel accelerometerChartPanel1 = new ChartPanel(Util.createChart(accelerometerDataset, "Acceleration", "Time", "Gs"));
+        ChartPanel accelerometerChartPanel = new ChartPanel(Util.createChart(accelerometerDataset, "Aceleración", "Tiempo", "Gs"));
+        ChartPanel accelerometerChartPanel1 = new ChartPanel(Util.createChart(accelerometerDataset, "Aceleración", "Tiempo", "Gs"));
         accelerometerChartPanel.validate();
         accelerometerChartPanel.setPreferredSize(accelerometerGraphPanel.getPreferredSize());
         accelerometerGraphPanel.add(accelerometerChartPanel, BorderLayout.CENTER);
@@ -127,10 +127,10 @@ public class MainFrame extends JFrame {
         accelerometerGraphPanel.validate();
         // END Accelerometer chart
         // Pressure chart
-        pressureSeries = new XYSeries("Pressure");
+        pressureSeries = new XYSeries("Presión");
         XYSeriesCollection pressureDataset = new XYSeriesCollection();
         pressureDataset.addSeries(pressureSeries);
-        ChartPanel pressureChartPanel = new ChartPanel(Util.createChart(pressureDataset, "Pressure", "Time", "hPa"));
+        ChartPanel pressureChartPanel = new ChartPanel(Util.createChart(pressureDataset, "Presión", "Tiempo", "hPa"));
         accelerometerChartPanel.validate();
         pressureSubPane.add(pressureChartPanel, BorderLayout.CENTER);
         // END Pressure chart

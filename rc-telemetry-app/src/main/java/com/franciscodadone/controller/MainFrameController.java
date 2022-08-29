@@ -49,9 +49,9 @@ public class MainFrameController {
                         view.getMaxGLabel().setText("Max Gs: " + df.format(Accelerometer.maxGForceRegistered) + "G");
 
                         if (BMP280.maxAltitudeRegistered < BMP280.altitude) BMP280.maxAltitudeRegistered = BMP280.altitude;
-                        view.getMaxAltitudeLabel().setText("Max Altitude: " + df.format(BMP280.maxAltitudeRegistered) + "m");
+                        view.getMaxAltitudeLabel().setText("Max Altura: " + df.format(BMP280.maxAltitudeRegistered) + "m");
 
-                        view.getFlightTimeLabel().setText("Flight time: " + LocalTime.ofSecondOfDay(Global.flightTime));
+                        view.getFlightTimeLabel().setText("T. Vuelo: " + LocalTime.ofSecondOfDay(Global.flightTime));
 
                         if (i2 == 60) {
                             view.getAltitudeSeries().remove(0);
@@ -103,7 +103,7 @@ public class MainFrameController {
     private void connectArduino() {
         ArduinoHandler.disconnect();
         if (view.getComPortComboBox().getSelectedItem() == null) {
-            JOptionPane.showMessageDialog(null, "No COM port selected!","Error",  JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null, "Ningún puerto COM seleccionado!","Error",  JOptionPane.ERROR_MESSAGE);
             return;
         }
         boolean started = ArduinoHandler.connect((SerialPort)view.getComPortComboBox().getSelectedItem());
