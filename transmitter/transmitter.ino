@@ -80,17 +80,31 @@ void setup() {
   ti = millis();
 }
 
-// Counter
 long int flight_time = 0;
+
+struct {
+  uint8_t flight_time;
+} times;
 
 void interrupt() {
   intFlag = true;
-  flight_time += 1;
+  if (times.flight_time) times.flight_time--;
 }
 
 int16_t ax, ay, az, gy, gx, gz, mx, my, mz;
 
 void loop() {
+  update_flight_time();
+  calculate_and_send_data();
+}
+
+void update_flight_time() {
+  if (times.flight_time) return;
+  flight_time++;
+  times.flight_time = 100;
+}
+
+void calculate_and_send_data() {
   while (!intFlag);
   intFlag = false;
  

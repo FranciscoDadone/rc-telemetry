@@ -9,6 +9,7 @@ import com.franciscodadone.model.Horizon;
 import com.franciscodadone.utils.Global;
 
 import javax.swing.*;
+import java.text.DecimalFormat;
 import java.time.LocalTime;
 
 public class MainFrameController {
@@ -28,6 +29,8 @@ public class MainFrameController {
         Object[] ports = ArduinoHandler.getPorts();
         for (Object port : ports) view.getComPortComboBox().addItem(port);
 
+        DecimalFormat df = new DecimalFormat("#.#");
+
         new Thread(() -> {
             int i = -1;
             int i2 = -1;
@@ -41,11 +44,10 @@ public class MainFrameController {
                         view.getAccelerometerMaxSeries().add(i, Accelerometer.maxZ);
                         view.getPressureSeries().add(i, BMP280.pressure);
 
-                        if (Accelerometer.maxGForceRegistered < Accelerometer.maxZ) Accelerometer.maxGForceRegistered = Accelerometer.maxZ;
-                        view.getMaxGLabel().setText("Max Gs: " + Accelerometer.maxGForceRegistered + "G");
+                        view.getMaxGLabel().setText("Max Gs: " + df.format(Accelerometer.maxGForceRegistered) + "G");
 
                         if (BMP280.maxAltitudeRegistered < BMP280.altitude) BMP280.maxAltitudeRegistered = BMP280.altitude;
-                        view.getMaxAltitudeLabel().setText("Max Altitude: " + BMP280.maxAltitudeRegistered + "m");
+                        view.getMaxAltitudeLabel().setText("Max Altitude: " + df.format(BMP280.maxAltitudeRegistered) + "m");
 
                         view.getFlightTimeLabel().setText("Flight time: " + LocalTime.ofSecondOfDay(Global.flightTime));
 
@@ -129,7 +131,7 @@ public class MainFrameController {
     }
 
     private void updateGForce() {
-        view.getGForce().setSpeed((Accelerometer.maxZ / 1000) + 1);
+        view.getGForce().setSpeed(Accelerometer.maxZ);
     }
 
     private void updateTemperature() {

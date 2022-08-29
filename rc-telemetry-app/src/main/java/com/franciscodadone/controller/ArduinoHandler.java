@@ -81,7 +81,8 @@ public class ArduinoHandler {
 
                                 // Accelerometer
                                 Accelerometer.z = Integer.parseInt((String) arr[6]);
-                                if (Math.abs(Accelerometer.z) > Accelerometer.maxZ) Accelerometer.maxZ = Math.abs(Accelerometer.z);
+                                if (Math.abs(Accelerometer.z) > Accelerometer.maxZ) Accelerometer.maxZ = (Math.abs(Accelerometer.z) / 1000) + 1;
+                                if (Accelerometer.maxGForceRegistered < Accelerometer.maxZ) Accelerometer.maxGForceRegistered = Accelerometer.maxZ;
                                 // END Accelerometer
 
                                 Global.flightTime = Integer.parseInt((String) arr[7]);
