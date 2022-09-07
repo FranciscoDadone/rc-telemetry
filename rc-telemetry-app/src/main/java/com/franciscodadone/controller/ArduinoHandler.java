@@ -24,7 +24,7 @@ public class ArduinoHandler {
     public static boolean connect(SerialPort port) {
         serialPort = port;
 
-        int BaudRate = 9600;
+        int BaudRate = ConfigurationHandler.getBaudRate();
         int DataBits = 8;
         int StopBits = SerialPort.ONE_STOP_BIT;
         int Parity   = SerialPort.NO_PARITY;
@@ -52,10 +52,19 @@ public class ArduinoHandler {
             try {
                 while (true) {
                     if (Global.appStatus.equals(AppStatus.STARTED) || Global.appStatus.equals(AppStatus.CALIBRATING)) {
-                        byte[] readBuffer = new byte[100];
+
+                        /////////////////////////////////////////////////////
+                        // Codigo nuevo para enviar solo una cadena de bytes
+                        byte[] readBuffer = new byte[4]; // 100
                         serialPort.readBytes(readBuffer, readBuffer.length);
 
                         String S = new String(readBuffer, StandardCharsets.UTF_8);
+
+                        if (readBuffer[3] == (byte)(readBuffer[0] + readBuffer[1] + readBuffer[2])) {
+                            System.out.println(readBuffer[0]);
+                        }
+
+                        /////////////////////////////////////////////////////
 
                         if (Global.appStatus.equals(AppStatus.CALIBRATING) && S.lines().toList().get(0).startsWith(";")) {
                             calibrationFrame.setVisible(false);
@@ -63,6 +72,7 @@ public class ArduinoHandler {
                         }
 
                         for (String s : S.lines().toList()) {
+//                            System.out.println(s);
                             if (s.contains("calibration")) {
                                 calibrationFrame = new CompassCalibrationFrame();
 

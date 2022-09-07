@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class ConfigurationHandler {
+    private static int baud_rate;
 
     public static void update() {
         Map<String, Integer> map = new HashMap<>();
@@ -30,6 +31,8 @@ public class ConfigurationHandler {
         map.put("H_down_trim", Horizon.gyDownTrim);
 
         map.put("altitude_trim", (int) BMP280.altitudeTrim);
+
+        map.put("baud_rate", baud_rate);
 
         try {
             YamlWriter writer = new YamlWriter(new FileWriter("configuration.yml"));
@@ -62,9 +65,15 @@ public class ConfigurationHandler {
 
             BMP280.altitudeTrim = Integer.parseInt(String.valueOf(hm.get("altitude_trim")));
 
+            baud_rate = Integer.parseInt(String.valueOf(hm.get("baud_rate")));
+
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public static int getBaudRate() {
+        return baud_rate;
     }
 
 }

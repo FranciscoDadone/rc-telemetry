@@ -3,7 +3,7 @@
 #include "SparkFunBME280.h"
 #include <MPU9250_asukiaaa.h>
 
-#define CALIB_SEC 10 // magnetometer calibration (20s preffered)
+#define CALIB_SEC 3 // magnetometer calibration (20s preffered)
 
 MPU9250_asukiaaa mySensor;
 BME280 mySensorA;
@@ -71,40 +71,8 @@ void calculate_and_send_data() {
   mySensor.magUpdate();
   mDirection = mySensor.magHorizDirection();
 
-  sendData();
-}
-
-void sendData() {
-  Serial.print(";");
-  // Gyro
-  Serial.print(aX * 1000, 0);
-  Serial.print(" ");
-  Serial.print(aY * 1000, 0);
-  Serial.print(" ");
-  Serial.print(aZ * 1000, 0);
-  Serial.print(" ");
-
-  // Altitude and Temperature
-  Serial.print(mySensorA.readFloatAltitudeMeters(), 2);
-  Serial.print(" ");
-  Serial.print(mySensorA.readFloatPressure() / 100, 2);
-  Serial.print(" ");
-  Serial.print(mySensorA.readTempC(), 2);
-  Serial.print(" ");
-  
-  // Accelerometer
-  //Serial.print(gX);
-  Serial.print(aSqrt);
-  Serial.print(" ");
-
-  // Flight time
-  Serial.print(flight_time);
-  Serial.print(" ");
-  
-  // Magnetometer
-  Serial.print(mDirection);
-
-  Serial.println(";");
+  sendCompressedData();
+//  sendData();
 }
 
 void setMagMinMaxAndSetOffset(MPU9250_asukiaaa* sensor, int seconds) {
@@ -133,4 +101,103 @@ void setMagMinMaxAndSetOffset(MPU9250_asukiaaa* sensor, int seconds) {
   sensor->magXOffset = - (magXMax + magXMin) / 2;
   sensor->magYOffset = - (magYMax + magYMin) / 2;
   sensor->magZOffset = - (magZMax + magZMin) / 2;
+}
+
+void sendData() {
+  Serial.print(";");
+  // Gyro
+  Serial.print(aX * 1000, 0);
+  Serial.print(" ");
+  Serial.print(aY * 1000, 0);
+  Serial.print(" ");
+  Serial.print(aZ * 1000, 0);
+  Serial.print(" ");
+
+  // Altitude and Temperature
+  Serial.print(mySensorA.readFloatAltitudeMeters(), 2);
+  Serial.print(" ");
+  Serial.print(mySensorA.readFloatPressure() / 100, 2);
+  Serial.print(" ");
+  Serial.print(mySensorA.readTempC(), 2);
+  Serial.print(" ");
+  
+  // Accelerometer
+  Serial.print(aSqrt);
+  Serial.print(" ");
+
+  // Flight time
+  Serial.print(flight_time);
+  Serial.print(" ");
+  
+  // Magnetometer
+  Serial.print(mDirection);
+
+  Serial.println(";");
+}
+
+String formatTwoDigit(int toFormat) {
+  String toPrint = "";
+  if (abs(toFormat) <= 9) (toFormat >= 0) ? toPrint = "0" + String(toFormat, 0) : toPrint = "-0" + String(abs(toFormat), 0);
+  else if (abs(toFormat) > 9 && abs(toFormat) <= 99) (toFormat >= 0) ? toPrint = String(toFormat, 0) : toPrint = "-" + String(abs(aX), 0);
+  else if (abs(toFormat) > 99) (toFormat >= 0) ? toPrint = "99" : toPrint = "-99";
+  toPrint.replace(" ", "");
+  return toPrint;
+}
+
+void sendCompressedData() {
+  char bytes[4];
+
+  bytes[0] = 11;
+  bytes[1] = 12;
+  bytes[2] = 111;
+  bytes[3] = bytes[0] + bytes[1] + bytes[2];
+
+  Serial.write(bytes);
+
+//  Serial.println(sizeof(bytes));
+  
+  /*
+  char toPrint;
+  aX = (int)(aX * 100);
+
+  toPrint = (abs(aX) <= 99) ? aX : (aX >= 0) ? toPrint = 99 : toPrint = -99;
+  
+//  Serial.print(toPrint);
+  int a = Serial.write(999);
+  Serial.println("l: " + String(a));
+  */
+
+
+
+  
+  /*
+  // Gyro
+  Serial.print(aX * 10, 0);
+  Serial.print(" ");
+  Serial.print(aY * 10, 0);
+  Serial.print(" ");
+  Serial.print(aZ * 10, 0);
+  Serial.print(" ");
+
+  // Altitude and Temperature
+  Serial.print(mySensorA.readFloatAltitudeMeters(), 2);
+  Serial.print(" ");
+  Serial.print(mySensorA.readFloatPressure() / 100, 2);
+  Serial.print(" ");
+  Serial.print(mySensorA.readTempC(), 2);
+  Serial.print(" ");
+  
+  // Accelerometer
+  Serial.print(aSqrt);
+  Serial.print(" ");
+
+  // Flight time
+  Serial.print(flight_time);
+  Serial.print(" ");
+  
+  // Magnetometer
+  Serial.print(mDirection);
+
+  */
+//  Serial.println();
 }
