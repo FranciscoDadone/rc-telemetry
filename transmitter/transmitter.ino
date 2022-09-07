@@ -149,7 +149,7 @@ void sendCompressedData() {
 
   bytes[0] = 11;
   bytes[1] = 12;
-  bytes[2] = 111;
+  bytes[2] = 0x1;
   bytes[3] = bytes[0] + bytes[1] + bytes[2];
 
   Serial.write(bytes);
